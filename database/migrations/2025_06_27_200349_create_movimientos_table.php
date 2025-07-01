@@ -15,17 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('tipo_movimiento');
             $table->unsignedBigInteger('producto_id'); //Relacion con productos/insumos
-            $table->string('clasificacion')->nullable();
+            $table->string('clasificacion_id');
             $table->integer('cantidad');
             $table->date('fecha');
             $table->string('lote')->nullable();
             $table->date('fecha_vencimiento')->nullable();
             $table->string('evento')->nullable();
             $table->string('responsable')->nullable();
-            $table->unsignedBigInteger('solicitado_por')->nullable();
+            $table->unsignedBigInteger('solicitante_id')->nullable();
             $table->string('motivo')->nullable();
 
-            $table->foreign('solicitado_por')->references('id')->on('solicitantes');
+            $table->foreign('clasificacion_id')->references('id')->on('clasificaciones');
+            $table->foreign('solicitante_id')->references('id')->on('solicitantes');
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->timestamps();
         });

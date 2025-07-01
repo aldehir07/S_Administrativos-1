@@ -9,7 +9,7 @@
         <!-- Tipo de Registro -->
         <div class="mb-4">
             <label class="form-label fw-bold">Tipo de Registro</label>
-            <select name="registro" class="form-select" id="tipoRegistro" required>
+            <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
                 <option value="" disabled selected>Seleccione</option>
                 <option value="Entrada">Entrada</option>
                 <option value="Salida">Salida</option>
@@ -143,7 +143,7 @@
                         <td>{{ $mov->producto->nombre ?? '' }}</td>
                         <td>{{ $mov->cantidad }}</td>
                         <td>{{ $mov->fecha_vencimiento }}</td>
-                        <td>{{ $mon->responsable }}</td>
+                        <td>{{ $mov->responsable }}</td>
                         <td>{{ $mov->tipo_movimiento }}</td>
                         <td>
                             @if ($mov->tipo_movimiento === 'Entrada')
@@ -169,7 +169,7 @@
         const tipoRegistro = document.getElementById('tipoRegistro');
         const clasificacionSelect = document.getElementById('clasificacionSelect');
         const productoSelect = document.getElementById('productoSelect');
-        
+
         tipoRegistro.addEventListener('change', function () {
             const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
             tipos.forEach(tipo => {

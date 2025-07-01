@@ -46,7 +46,7 @@ class MovimientoController extends Controller
             'fecha_vencimiento' => $request->fecha_vencimiento,
             'solicitante_id' => $request->solicitante_id,
             'responsable' => $request->responsable,
-            'motivo' => $request->motivo    
+            'motivo' => $request->motivo
         ]);
 
 
@@ -56,7 +56,7 @@ class MovimientoController extends Controller
         if($request->tipo_movimiento == 'Entrada'){
             $producto->stock_actual += $request->cantidad;
         }else{
-            $producto->stock_actual -= $request->cantiad;
+            $producto->stock_actual -= $request->cantidad;
         }
         $producto->save();
 
