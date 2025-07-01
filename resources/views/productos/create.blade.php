@@ -62,7 +62,7 @@
                 {{session('success')}}
             </div>
         @endif
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" id="tabla">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -91,6 +91,13 @@
                             <a href="{{ route('producto.edit', $producto->id) }}" class='btn btn-sm btn-warning'>
                                 <i class="fas fa-edit"></i>
                             </a>
+                            <form action="{{ route('producto.destroy', $producto->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-sm btn-danger"  onclick="return confirm('¿Estas seguro de que deseaa eliminar este producto?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
@@ -112,6 +119,14 @@
 </div>
 
 <script>
+
+    $(document).ready(function() {
+        $('#tabla').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+            }
+        });
+    });
     document.getElementById('imagenInput').addEventListener('change', function(event){
         const [file] = event.target.files;
         const preview = document.getElementById('previewImagen');

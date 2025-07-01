@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\ProductosImport;
+use App\Models\Clasificacion;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,6 +25,7 @@ class ProductoController extends Controller
     public function create()
     {
         $productos = Producto::all();
+
         return view('productos.create', compact('productos'));
     }
 
@@ -64,8 +66,9 @@ class ProductoController extends Controller
      */
     public function edit(Producto $producto)
     {
+        $clasificaciones = Clasificacion::all();
         $productos = Producto::all();
-        return view('productos.edit', compact('producto' ,'productos'));
+        return view('productos.edit', compact('producto' ,'productos', 'clasificaciones'));
     }
 
     /**
@@ -98,7 +101,8 @@ class ProductoController extends Controller
      */
     public function destroy(Producto $producto)
     {
-        //
+        $producto->delete();
+        return redirect()->route('producto.create')->with('success', 'Producto eliminado exitosamente.');
     }
 
 

@@ -26,6 +26,10 @@ class Movimiento extends Model
         return $this->belongsTo(Solicitante::class);
     }
 
+    public function clasificacion(){
+        return $this->belongsTo(Clasificacion::class);
+    }
+
     public function producto()
     {
         return $this->belongsTo(Producto::class);

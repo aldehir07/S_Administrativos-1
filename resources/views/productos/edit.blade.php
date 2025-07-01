@@ -14,20 +14,14 @@
                 <!-- Clasificación -->
                 <div class="mb-3 ">
                     <label class="form-label">Clasificación</label>
-                    <select name="clasificacion" class="form-select">
-                        <option value="" disabled selected>Seleccione</option>
-                        <option value="comestibles"
-                            {{ $producto->clasificacion == 'comestibles' ? 'selected' : ''}}>
-                            Comestibles</option>
-                        <option value="desechables"
-                            {{ $producto->clasificacion == 'desechables' ? 'selected' : ''}}>
-                            Desechables</option>
-                        <option value="utiles de oficina"
-                            {{ $producto->clasificacion == 'utiles de oficina' ? 'selected' : ''}}>
-                            Utiles de oficina</option>
-                        <option value="utiles de limpieza"
-                            {{ $producto->clasificacion == 'utiles de limpieza' ? 'selected' : ''}}>
-                            Insumos de limpieza</option>
+                    <select name="clasificacion_id" class="form-select">
+                        <option value="" disabled>Seleccione</option>
+                        @foreach($clasificaciones as $clasificacion)
+                            <option value="{{ $clasificacion->id }}"
+                                {{ old('clasificacion_id', $producto->clasificacion_id) == $clasificacion->id ? 'selected' : '' }}>
+                                {{ $clasificacion->nombre }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -44,6 +38,11 @@
                 <div class="mb-3">
                     <label class="form-label">Stock Minimo</label>
                     <input type="number" name="stock_minimo" class="form-control" value="{{ old('stock_minimo', $producto->stock_minimo) }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Stock Actual</label>
+                    <input type="number" name="stock_actual" class="form-control" value="{{ old('stock_actual', $producto->stock_actual) }}">
                 </div>
 
                 <!-- Imagen -->
@@ -81,7 +80,9 @@
                     <th>Imagen</th>
                     <th>Clasificacion</th>
                     <th>Nombre</th>
+                    <th>stock actual</th>
                     <th>stock_minimo</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -93,9 +94,11 @@
                                 <img src="{{ asset('storage/'.$producto->imagen) }}" alt="Imagen" width="40">
                             @endif
                         </td>
-                        <td>{{ $producto->clasificacion }}</td>
+                        <td>{{ $producto->clasificacion->nombre }}</td>
                         <td>{{ $producto->nombre }}</td>
+                        <td>{{ $producto->stock_actual }}</td>
                         <td>{{ $producto->stock_minimo }}</td>
+                        
                     </tr>
                 @endforeach
             </tbody>

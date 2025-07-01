@@ -11,6 +11,7 @@ class Producto extends Model
         'nombre',
         'clasificacion_id',
         'imagen',
+        'stock_actual',
         'stock_minimo'
     ];
 

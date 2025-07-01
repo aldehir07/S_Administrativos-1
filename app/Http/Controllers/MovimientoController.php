@@ -46,7 +46,8 @@ class MovimientoController extends Controller
             'fecha_vencimiento' => $request->fecha_vencimiento,
             'solicitante_id' => $request->solicitante_id,
             'responsable' => $request->responsable,
-            'motivo' => $request->motivo
+            'motivo' => $request->motivo,
+            'observaciones' => $request->observaciones
         ]);
 
 
@@ -76,7 +77,11 @@ class MovimientoController extends Controller
      */
     public function edit(Movimiento $movimiento)
     {
-        //
+        $movimientos = Movimiento::with(['producto', 'solicitante'])->latest()->get();
+        $clasificaciones = Clasificacion::all();
+        $productos = Producto::all();
+        $solicitantes = Solicitante::all();
+        return view('movimientos.edit', compact('movimiento', 'movimientos', 'clasificaciones', 'productos', 'solicitantes'));
     }
 
     /**
@@ -84,7 +89,8 @@ class MovimientoController extends Controller
      */
     public function update(Request $request, Movimiento $movimiento)
     {
-        //
+        $movimiento->update($request->all());
+        return redirect()->route('movimiento.create')->with('success', 'Movimiento actualizado correctamente!.');
     }
 
     /**
@@ -92,6 +98,7 @@ class MovimientoController extends Controller
      */
     public function destroy(Movimiento $movimiento)
     {
-        //
+        $movimiento->delete();
+        return redirect()->route('movimiento.create')->with('success', 'Movimiento eliminado del incentario exitosamente!.');
     }
 }

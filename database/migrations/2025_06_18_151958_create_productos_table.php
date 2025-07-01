@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre', 50);
             $table->unsignedBigInteger('clasificacion_id');
             $table->string('imagen')->nullable();
+            $table->Integer('stock_actual')->default(0);
             $table->integer('stock_minimo')->nullable();
             $table->foreign('clasificacion_id')->references('id')->on('clasificaciones');
             $table->timestamps();
