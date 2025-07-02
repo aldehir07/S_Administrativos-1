@@ -36,7 +36,7 @@ class ProductoController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'clasificacion' => 'required',
+            'clasificacion_id' => 'required',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'stock_minimo' => 'nullable|integer'
             
@@ -44,9 +44,10 @@ class ProductoController extends Controller
 
         Producto::create([
             'nombre' => $request->nombre,
-            'clasificacion' => $request->clasificacion,
+            'clasificacion_id' => $request->clasificacion_id,
             'imagen' => $request->file('imagen') ? $request->file('imagen')->store('productos', 'public') : null,
-            'stock_minimo' => $request->stock_minimo
+            'stock_minimo' => $request->stock_minimo,
+            'stock_actual' => $request->stock_actual
         ]);
 
         // return $request;
@@ -78,7 +79,7 @@ class ProductoController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'clasificacion' => 'required',
+            'clasificacion_id' => 'required',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'stock_minimo' => 'nullable|integer'
         ]);
@@ -89,8 +90,9 @@ class ProductoController extends Controller
         }
 
         $producto->nombre = $request->nombre;
-        $producto->clasificacion = $request->clasificacion;
+        $producto->clasificacion_id = $request->clasificacion_id;
         $producto->stock_minimo = $request->stock_minimo;
+        $producto->stock_actual = $request->stock_actual;
         $producto->save();
 
         return redirect()->route('producto.edit', $producto)->with('success', 'Producto actualizado correctamente.');

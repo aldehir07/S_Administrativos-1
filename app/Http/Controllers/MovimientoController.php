@@ -54,14 +54,21 @@ class MovimientoController extends Controller
         //Actualizar el stock_actual
         $producto = Producto::find($request->producto_id);
 
-        if($request->tipo_movimiento == 'Entrada'){
+        if ($request->tipo_movimiento == 'Entrada') {
             $producto->stock_actual += $request->cantidad;
-        }else{
+        } else {
             $producto->stock_actual -= $request->cantidad;
         }
         $producto->save();
 
-        return redirect()->route('movimiento.create')->with('success', 'Movimiento registrado y stock actualizado!.');
+        $alerta_stock = null;
+        if ($producto->stock_actual <= $producto->stock_minimo) {
+            $alerta_stock = "¡Atencion! El producto '{$producto->nombre}' ha llegado al stock minimo. Es necesario hacer un pedido.";
+        }
+        return redirect()->route('movimiento.create')->with([
+            'success' => 'Movieminto registrado y stock actualizado.',
+            'alerta_stock' => $alerta_stock
+        ]);
     }
 
     /**

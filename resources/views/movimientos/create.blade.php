@@ -2,6 +2,18 @@
 @section('content')
 <div class="container">
     <h2 class="mb-4">Registrar Movimiento de Inventario</h2>
+    @if(session('alerta_stock'))
+    <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ session('alerta_stock') }}
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
 
     <form method="POST" action="{{ route('movimiento.store') }}">
         @csrf
@@ -60,7 +72,7 @@
             <div class="col-md-6">
 
                 <!-- Fecha -->
-                <div class="mb-3">
+                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
                     <label class="form-label">Fecha</label>
                     <input type="date" name="fecha" class="form-control" required>
                 </div>
@@ -128,7 +140,7 @@
 
         </div>
         <div class="table-responsive text-nowrap">
-            <table class="table">
+            <table class="table" id="tabla">
                 <thead>
                     <tr>
                         <th class="col-entrada col-salida col-descarte">Clasificación</th>
@@ -191,6 +203,15 @@
 
 <!-- JavaScript para alternar campos -->
 <script>
+
+    $(document).ready(function() {
+        $('#tabla').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+            }
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         const tipoRegistro = document.getElementById('tipoRegistro');
         const clasificacionSelect = document.getElementById('clasificacionSelect');
