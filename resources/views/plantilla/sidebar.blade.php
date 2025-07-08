@@ -24,7 +24,7 @@
                         <li class="pc-item"><a class="pc-link" href="{{ route('producto.create') }}">Productos</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Reportes</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#!">Notificaciones</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('certificados.create') }}">Certificados</a></li>
                     </ul>
                 </li>
                 <li class="pc-item pc-hasmenu">

@@ -21,7 +21,8 @@
         <div class="row">
             <div class="col-md-6">
 
-                <div class="mb-3 entrada-campos salida-campos d-none">
+                <!-- Clasificación -->
+                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
                     <label class="form-label">Clasificación</label>
                     <select name="clasificacion_id" class="form-select" id="clasificacionSelect" required>
                         @foreach($clasificaciones as $clasificacion)
@@ -30,7 +31,11 @@
                         </option>
                         @endforeach
                     </select>
-                    <label class="form-label mt-2">Producto</label>
+                </div>
+
+                <!-- Producto -->
+                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <label class="form-label">Producto</label>
                     <select name="producto_id" class="form-select" id="productoSelect" required>
                         @foreach($productos as $producto)
                         <option value="{{ $producto->id }}" {{ $movimiento->producto_id == $producto->id ? 'selected' : '' }}>
@@ -113,9 +118,9 @@
 <div class="card">
     <h5 class="card-header">INVENTARIO</h5>
     <div class="table-responsive text-nowrap">
-        <table class="table">
+        <table class="table table-striped" id="tabla">
             <thead>
-                <tr>
+                <tr class="table-dark">
                     <th>Fecha Entrega</th>
                     <th>Solicitante</th>
                     <th>Producto</th>
@@ -155,38 +160,16 @@
 
 <!-- JavaScript para alternar campos -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tipoRegistro = document.getElementById('tipoRegistro');
-        const clasificacionSelect = document.getElementById('clasificacionSelect');
-        const productoSelect = document.getElementById('productoSelect');
-
-        tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
-            tipos.forEach(tipo => {
-                document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
-            });
-
-            if (this.value) {
-                const seleccionado = this.value.toLowerCase();
-                document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => el.classList.remove('d-none'));
+    $(document).ready(function() {
+        $('#tabla').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
             }
         });
+    });
 
-        clasificacionSelect.addEventListener('change', function() {
-            const clasificacionId = this.value;
-            productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
-
-            fetch(`/productos/por-clasificacion/${clasificacionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    let options = '<option value="" disabled selected>Seleccione un producto</option>';
-                    data.forEach(producto => {
-                        options += `<option value="${producto.id}">${producto.nombre}</option>`;
-                    });
-                    productoSelect.innerHTML = options;
-                });
-        });
-
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoRegistro = document.getElementById('tipoRegistro');
         if (tipoRegistro && tipoRegistro.value) {
             const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
             tipos.forEach(tipo => {
@@ -194,6 +177,36 @@
             });
             const seleccionado = tipoRegistro.value.toLowerCase();
             document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => el.classList.remove('d-none'));
+        }
+
+        tipoRegistro.addEventListener('change', function() {
+            const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
+            tipos.forEach(tipo => {
+                document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
+            });
+            if (this.value) {
+                const seleccionado = this.value.toLowerCase();
+                document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => el.classList.remove('d-none'));
+            }
+        });
+
+        // Si quieres actualizar productos por clasificación, agrega el mismo código que en create
+        const clasificacionSelect = document.getElementById('clasificacionSelect');
+        const productoSelect = document.getElementById('productoSelect');
+        if (clasificacionSelect && productoSelect) {
+            clasificacionSelect.addEventListener('change', function() {
+                const clasificacionId = this.value;
+                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+                fetch(`/productos/por-clasificacion/${clasificacionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
+                        data.forEach(producto => {
+                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
+                        });
+                        productoSelect.innerHTML = options;
+                    });
+            });
         }
     });
 </script>

@@ -22,11 +22,13 @@
         <div class="mb-4">
             <label class="form-label fw-bold">Tipo de Registro</label>
             <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
-                <option value="" disabled selected>Seleccione</option>
-                <option value="Entrada">Entrada</option>
-                <option value="Salida">Salida</option>
-                <option value="Descarte">Descarte</option>
-                <option value="Certificados">Certificados</option>
+                <option value="" {{ !old('tipo_movimiento') && !isset($producto_id) ? 'selected' : '' }}>Seleccione</option>
+                <option value="Entrada"
+                    {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>
+                    Entrada</option>
+                <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
+                <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
+                <option value="Certificados" {{ old('tipo_movimiento' == 'Certificados' ? 'selected' : '' )}}>Certificados</option>
             </select>
         </div>
 
@@ -38,25 +40,63 @@
                 <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
                     <label class="form-label">Clasificación</label>
                     <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
-                        <option value="" disabled selected>Seleccione</option>
+                        <option value="" disabled>Seleccione</option>
                         @foreach ($clasificaciones as $clasificacion)
-                        <option value="{{ $clasificacion->id }}">{{ $clasificacion->nombre }}</option>
+                        <option value="{{ $clasificacion->id }}"
+                            {{ (isset($producto_id) && $productos->find($producto_id)?->clasificacion_id == $clasificacion->id) ? 'selected' : '' }}>
+                            {{ $clasificacion->nombre }}
+                        </option>
                         @endforeach
                     </select>
-                    <select name="producto_id" id="productoSelect" class="form-select" required>
-                        <option value="" disabled selected>Seleccione un producto</option>
-                    </select>
+                </div>
 
+                <!-- Productos dinámicos para Salida -->
+                <div class="mb-3 salida-campos d-none" id="productosSalidaContainer">
+                    <label class="form-label">Productos y Cantidades</label>
+                    <div id="productosSalidaRows">
+                        <div class="row mb-2 producto-salida-row">
+                            <div class="col-8">
+                                <select name="productos_salida[]" class="form-select producto-salida-select">
+                                    <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
+                                    @foreach ($productos as $producto)
+                                    <option value="{{ $producto->id }}" {{ (isset($producto_id) && $producto_id == $producto->id) ? 'selected' : '' }}>
+                                        {{ $producto->nombre }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <input type="number" name="cantidades_salida[]" class="form-control" min="1" placeholder="Cantidad">
+                            </div>
+                            <div class="col-1 d-flex align-items-center">
+                                <button type="button" class="btn btn-danger btn-sm remove-producto-salida" title="Quitar">
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="agregarProductoSalida">Agregar otro producto</button>
+                </div>
+
+                <!-- Producto para Entrada, Descarte, Certificados -->
+                <div class="mb-3 entrada-campos descarte-campos d-none">
+                    <label class="form-label">Producto</label>
+                    <select name="producto_id" id="productoSelectUnico" class="form-select">
+                        <option value="" disabled selected>Seleccione un producto</option>
+                        @foreach ($productos as $producto)
+                        <option value="{{ $producto->id }}">{{ $producto->nombre }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Cantidad -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos certificados-campos d-none">
+                <div class="mb-3 entrada-campos descarte-campos certificados-campos d-none">
                     <label class="form-label">Cantidad</label>
                     <input type="number" name="cantidad" class="form-control" min="1">
                 </div>
 
                 <!-- Evento/Destino -->
-                <div class="mb-3 salida-campos d-none">
+                <div class="mb-3 salida-campos certificados-campos d-none">
                     <label class="form-label">Evento / Destino</label>
                     <input type="text" name="evento" class="form-control">
                 </div>
@@ -72,7 +112,7 @@
             <div class="col-md-6">
 
                 <!-- Fecha -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                <div class="mb-3 entrada-campos salida-campos descarte-campos certificados-campos d-none">
                     <label class="form-label">Fecha</label>
                     <input type="date" name="fecha" class="form-control" required>
                 </div>
@@ -202,8 +242,8 @@
 </div>
 
 <!-- JavaScript para alternar campos -->
-<script>
 
+<script>
     $(document).ready(function() {
         $('#tabla').DataTable({
             language: {
@@ -216,6 +256,57 @@
         const tipoRegistro = document.getElementById('tipoRegistro');
         const clasificacionSelect = document.getElementById('clasificacionSelect');
         const productoSelect = document.getElementById('productoSelect');
+        const productosSalidaContainer = document.getElementById('productosSalidaContainer');
+
+        function toggleProductosSalida() {
+            if (tipoRegistro.value === 'Salida') {
+                productosSalidaContainer.classList.remove('d-none');
+                // Agrega required a los campos de Salida
+                document.querySelectorAll('.producto-salida-select').forEach(el => el.setAttribute('required', 'required'));
+                document.querySelectorAll('input[name="cantidades_salida[]"]').forEach(el => el.setAttribute('required', 'required'));
+            } else {
+                productosSalidaContainer.classList.add('d-none');
+                // Quita required a los campos de Salida
+                document.querySelectorAll('.producto-salida-select').forEach(el => el.removeAttribute('required'));
+                document.querySelectorAll('input[name="cantidades_salida[]"]').forEach(el => el.removeAttribute('required'));
+            }
+        }
+
+        tipoRegistro.addEventListener('change', toggleProductosSalida);
+        toggleProductosSalida(); // Ejecutar al cargar
+
+        // Cuando agregues una nueva fila, también debes actualizar su select de producto
+        document.getElementById('agregarProductoSalida').addEventListener('click', function() {
+            const row = document.querySelector('.producto-salida-row').cloneNode(true);
+            row.querySelector('select').value = '';
+            row.querySelector('input').value = '';
+            document.getElementById('productosSalidaRows').appendChild(row);
+
+            // Actualiza el select de producto de la nueva fila según la clasificación seleccionada
+            const clasificacionId = clasificacionSelect.value;
+            const productoSelect = row.querySelector('.producto-salida-select');
+            if (clasificacionId) {
+                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+                fetch(`/productos/por-clasificacion/${clasificacionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
+                        data.forEach(producto => {
+                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
+                        });
+                        productoSelect.innerHTML = options;
+                    });
+            }
+        });
+
+        document.getElementById('productosSalidaRows').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-producto-salida')) {
+                const rows = document.querySelectorAll('.producto-salida-row');
+                if (rows.length > 1) {
+                    e.target.closest('.producto-salida-row').remove();
+                }
+            }
+        });
 
         tipoRegistro.addEventListener('change', function() {
             const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
@@ -231,17 +322,35 @@
 
         clasificacionSelect.addEventListener('change', function() {
             const clasificacionId = this.value;
-            productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
 
-            fetch(`/productos/por-clasificacion/${clasificacionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    let options = '<option value="" disabled selected>Seleccione un producto</option>';
-                    data.forEach(producto => {
-                        options += `<option value="${producto.id}">${producto.nombre}</option>`;
+            // Actualiza los selects de productos dinámicos (Salida)
+            document.querySelectorAll('.producto-salida-select').forEach(function(productoSelect) {
+                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+                fetch(`/productos/por-clasificacion/${clasificacionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
+                        data.forEach(producto => {
+                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
+                        });
+                        productoSelect.innerHTML = options;
                     });
-                    productoSelect.innerHTML = options;
-                });
+            });
+
+            // Actualiza el select de producto único (Entrada, Descarte, Certificados)
+            const productoUnicoSelect = document.getElementById('productoSelectUnico');
+            if (productoUnicoSelect) {
+                productoUnicoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+                fetch(`/productos/por-clasificacion/${clasificacionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
+                        data.forEach(producto => {
+                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
+                        });
+                        productoUnicoSelect.innerHTML = options;
+                    });
+            }
         });
 
         // Mapeo de columnas por tipo
@@ -284,6 +393,13 @@
 
         // Al cargar, muestra todas las columnas
         document.querySelectorAll('.filtro-movimiento[data-tipo=""]').forEach(btn => btn.click());
+
+        // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
+        @if(isset($producto_id))
+        //Forzar seleccion y mostrar campos de ENtrada
+        tipoRegistro.value = 'Entrada';
+        tipoRegistro.dispatchEvent(new Event('change'));
+        @endif
     });
 </script>
 @endsection

@@ -25,8 +25,8 @@ class ProductoController extends Controller
     public function create()
     {
         $productos = Producto::all();
-
-        return view('productos.create', compact('productos'));
+        $clasificaciones = Clasificacion::all();
+        return view('productos.create', compact('productos', 'clasificaciones'));
     }
 
     /**
@@ -43,15 +43,16 @@ class ProductoController extends Controller
         ]);
 
         Producto::create([
+
             'nombre' => $request->nombre,
             'clasificacion_id' => $request->clasificacion_id,
             'imagen' => $request->file('imagen') ? $request->file('imagen')->store('productos', 'public') : null,
             'stock_minimo' => $request->stock_minimo,
-            'stock_actual' => $request->stock_actual
+            'stock_actual' => $request->stock_actual ?? 0
         ]);
 
         // return $request;
-        return redirect()->route('producto.create')->with('sucess', 'Producto registrado correctamente.');
+        return redirect()->route('producto.create')->with('success', 'Producto registrado correctamente.');
     }
 
     /**

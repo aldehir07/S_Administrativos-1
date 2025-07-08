@@ -2,22 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Dato;
-use App\Models\Producto;
+use App\Models\Certificado;
 use Illuminate\Http\Request;
 
-class DatoController extends Controller
+class CertificadoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $productosCriticos = Producto::with('clasificacion')
-            ->whereColumn('stock_actual', '<=', 'stock_minimo')
-            ->get();
-
-        return view('datos.index', compact('productosCriticos'));
+        return view('certificados.index');
     }
 
     /**
@@ -25,7 +20,8 @@ class DatoController extends Controller
      */
     public function create()
     {
-        //
+        $certificados = Certificado::all();
+        return view('certificados.create', compact('certificados'));
     }
 
     /**
@@ -39,7 +35,7 @@ class DatoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Dato $dato)
+    public function show(Certificado $certificado)
     {
         //
     }
@@ -47,7 +43,7 @@ class DatoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Dato $dato)
+    public function edit(Certificado $certificado)
     {
         //
     }
@@ -55,7 +51,7 @@ class DatoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Dato $dato)
+    public function update(Request $request, Certificado $certificado)
     {
         //
     }
@@ -63,7 +59,7 @@ class DatoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Dato $dato)
+    public function destroy(Certificado $certificado)
     {
         //
     }

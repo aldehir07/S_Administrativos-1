@@ -4,7 +4,7 @@
 <div class="container">
     <h2 class="mb-4">Agregar Producto</h2>
 
-    <form method="POST" action="{{ route('producto.store') }}">
+    <form method="POST" action="{{ route('producto.store') }}" enctype="multipart/form-data">
         @csrf
         @method('POST')
         <div class="row">
@@ -14,12 +14,11 @@
                 <!-- Clasificación -->
                 <div class="mb-3 ">
                     <label class="form-label">Clasificación</label>
-                    <select name="clasificacion" class="form-select">
+                    <select name="clasificacion_id" class="form-select">
                         <option value="" disabled selected>Seleccione</option>
-                        <option value="comestibles">Comestibles</option>
-                        <option value="desechables">Desechables</option>
-                        <option value="utiles de oficina">Utiles de oficina</option>
-                        <option value="utiles de limpieza">Insumos de limpieza</option>
+                        @foreach ($clasificaciones as $clasificacion)
+                            <option value="{{ $clasificacion->id }}">{{ $clasificacion->nombre }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -27,15 +26,6 @@
                 <div class="mb-3">
                     <label class="form-label">Nombre del producto</label>
                     <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}">
-                </div>
-            </div>
-
-            <!-- Columna Derecha -->
-            <div class="col-md-6">
-            
-                <div class="mb-3">
-                    <label class="form-label">Stock Minimo</label>
-                    <input type="number" name="stock_minimo" class="form-control" value="{{ old('stock_minimo') }}">
                 </div>
 
                 <!-- Imagen -->
@@ -47,6 +37,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Columna Derecha -->
+            <div class="col-md-6">
+
+                <div class="mb-3">
+                    <label class="form-label">Stock Minimo</label>
+                    <input type="number" name="stock_minimo" class="form-control" value="{{ old('stock_minimo') }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Stock Actual</label>
+                    <input type="number" name="stock_actual" class="form-control" value="{{ old('stock_actual', 0) }}">
+                </div>
+             
+            </div>
         </div>
 
         <div class="text-end mt-4">
@@ -55,16 +60,16 @@
     </form>
 
     <!-- Tanla de insumos registrados -->
-     <div class="mt-5">
+    <div class="mt-5">
         <h4>Listado de Insumos</h4>
         @if (session('success'))
-            <div class="alert alert-success">
-                {{session('success')}}
-            </div>
+        <div class="alert alert-success">
+            {{session('success')}}
+        </div>
         @endif
-        <table class="table table-bordered table-striped" id="tabla">
+        <table class="table table-hover table-striped" id="tabla">
             <thead>
-                <tr>
+                <tr class="table-dark">
                     <th>ID</th>
                     <th>Imagen</th>
                     <th>Clasificacion</th>
@@ -76,35 +81,35 @@
             </thead>
             <tbody>
                 @foreach ($productos as $producto)
-                    <tr>
-                        <td>{{ $producto->id }}</td>
-                        <td>
-                            @if($producto->imagen)
-                                <img src="{{ asset('storage/'.$producto->imagen) }}" alt="Imagen" width="40">
-                            @endif
-                        </td>
-                        <td>{{ $producto->clasificacion->nombre ?? '' }}</td>
-                        <td>{{ $producto->nombre }}</td>
-                        <td>{{ $producto->stock_actual }}</td>
-                        <td>{{ $producto->stock_minimo }}</td>
-                        <td>
-                            <a href="{{ route('producto.edit', $producto->id) }}" class='btn btn-sm btn-warning'>
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('producto.destroy', $producto->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-sm btn-danger"  onclick="return confirm('¿Estas seguro de que deseaa eliminar este producto?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ $producto->id }}</td>
+                    <td>
+                        @if($producto->imagen)
+                        <img src="{{ asset('storage/'.$producto->imagen) }}" alt="Imagen" width="40">
+                        @endif
+                    </td>
+                    <td>{{ $producto->clasificacion->nombre ?? '' }}</td>
+                    <td>{{ $producto->nombre }}</td>
+                    <td>{{ $producto->stock_actual }}</td>
+                    <td>{{ $producto->stock_minimo }}</td>
+                    <td>
+                        <a href="{{ route('producto.edit', $producto->id) }}" class='btn btn-sm btn-warning'>
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('producto.destroy', $producto->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estas seguro de que deseaa eliminar este producto?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
-     </div>
-     <form action="{{ route('producto.importar') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+    </div>
+    <form action="{{ route('producto.importar') }}" method="POST" enctype="multipart/form-data" class="mb-4">
         @csrf
         <div class="row">
             <div class="col-md-6">
@@ -119,7 +124,6 @@
 </div>
 
 <script>
-
     $(document).ready(function() {
         $('#tabla').DataTable({
             language: {
@@ -127,13 +131,13 @@
             }
         });
     });
-    document.getElementById('imagenInput').addEventListener('change', function(event){
+    document.getElementById('imagenInput').addEventListener('change', function(event) {
         const [file] = event.target.files;
         const preview = document.getElementById('previewImagen');
-        if(file){
+        if (file) {
             preview.src = URL.createObjectURL(file);
             preview.style.display = ' block';
-        }else{
+        } else {
             preview.src = '#'
             preview.style.display = 'none';
         }
