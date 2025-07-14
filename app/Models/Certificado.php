@@ -11,6 +11,13 @@ class Certificado extends Model
         'cantidad',
         'responsable',
         'fecha',
-        'stock_actual'
+        'stock_actual',
+        'tipo'
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+        'cantidad' => 'integer',
+        'stock_actual' => 'integer',
     ];
 }

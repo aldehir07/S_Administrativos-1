@@ -18,4 +18,8 @@ class Producto extends Model
     public function clasificacion(){
         return $this->belongsTo(Clasificacion::class);
     }
+
+    public function movimientos(){
+        return $this->hasMany(Movimiento::class);
+    }
 }

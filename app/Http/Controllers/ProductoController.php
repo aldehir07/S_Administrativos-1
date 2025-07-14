@@ -39,7 +39,7 @@ class ProductoController extends Controller
             'clasificacion_id' => 'required',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'stock_minimo' => 'nullable|integer'
-            
+
         ]);
 
         Producto::create([
@@ -112,7 +112,7 @@ class ProductoController extends Controller
     public function importar(Request $request)
     {
         $request->validate([
-            'archivo' => 'required|file|mimes:csv,txt'
+            'archivo' => 'required|file|mimes:csv,txt,xlsx,xls'
         ]);
 
         Excel::import(new ProductosImport, $request->file('archivo'));

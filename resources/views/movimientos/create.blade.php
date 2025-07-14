@@ -28,7 +28,6 @@
                     Entrada</option>
                 <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                 <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-                <option value="Certificados" {{ old('tipo_movimiento' == 'Certificados' ? 'selected' : '' )}}>Certificados</option>
             </select>
         </div>
 
@@ -78,7 +77,7 @@
                     <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="agregarProductoSalida">Agregar otro producto</button>
                 </div>
 
-                <!-- Producto para Entrada, Descarte, Certificados -->
+                <!-- Producto para Entrada, Descarte -->
                 <div class="mb-3 entrada-campos descarte-campos d-none">
                     <label class="form-label">Producto</label>
                     <select name="producto_id" id="productoSelectUnico" class="form-select">
@@ -90,13 +89,13 @@
                 </div>
 
                 <!-- Cantidad -->
-                <div class="mb-3 entrada-campos descarte-campos certificados-campos d-none">
+                <div class="mb-3 entrada-campos descarte-campos  d-none">
                     <label class="form-label">Cantidad</label>
                     <input type="number" name="cantidad" class="form-control" min="1">
                 </div>
 
                 <!-- Evento/Destino -->
-                <div class="mb-3 salida-campos certificados-campos d-none">
+                <div class="mb-3 salida-campos  d-none">
                     <label class="form-label">Evento / Destino</label>
                     <input type="text" name="evento" class="form-control">
                 </div>
@@ -112,7 +111,7 @@
             <div class="col-md-6">
 
                 <!-- Fecha -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos certificados-campos d-none">
+                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
                     <label class="form-label">Fecha</label>
                     <input type="date" name="fecha" class="form-control" required>
                 </div>
@@ -130,7 +129,7 @@
                 </div>
 
                 <!-- Solicitado Por -->
-                <div class="mb-3 salida-campos certificados-campos d-none">
+                <div class="mb-3 salida-campos  d-none">
                     <label class="form-label">Solicitado por</label>
                     <select name="solicitante_id" class="form-select">
                         <option value="" disabled selected>Seleccione</option>
@@ -172,12 +171,10 @@
     <div class="card">
         <h5 class="card-header">INVENTARIO</h5>
         <div class="mb-3">
-            <button type="button" class="btn btn-outline-secundary btn-sm filtro-movimiento" data-tipo="">Todos</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm filtro-movimiento active" data-tipo="">Todos</button>
             <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
             <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
             <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
-            <button type="button" class="btn btn-outline-info btn-sm filtro-movimiento" data-tipo="Certificados">Certificados</button>
-
         </div>
         <div class="table-responsive text-nowrap">
             <table class="table" id="tabla">
@@ -186,7 +183,7 @@
                         <th class="col-entrada col-salida col-descarte">Clasificación</th>
                         <th class="col-entrada col-salida col-descarte">Producto</th>
                         <th class="col-entrada col-salida col-descarte">Cantidad</th>
-                        <th class="col-entrada ">Observaciones</th>
+                        <th class="col-entrada">Observaciones</th>
                         <th class="col-entrada col-salida col-descarte">Fecha</th>
                         <th class="col-salida">Solicitado por</th>
                         <th class="col-entrada">Fecha de Vencimiento</th>
@@ -210,10 +207,10 @@
                         <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
                         <td>
                             @if ($mov->tipo_movimiento === 'Entrada')
-                            <span class=" badge bg-success">Entrada</span>
-                            @elseif ( $mov->tipo_movimiento === 'Descarte')
+                            <span class="badge bg-success">Entrada</span>
+                            @elseif ($mov->tipo_movimiento === 'Descarte')
                             <span class="badge bg-warning">Descarte</span>
-                            @else ( $mov->tipo_movimineto === 'Salida')
+                            @elseif ($mov->tipo_movimiento === 'Salida')
                             <span class="badge bg-danger">Salida</span>
                             @endif
                         </td>
@@ -309,7 +306,7 @@
         });
 
         tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
+            const tipos = ['entrada', 'salida', 'descarte'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -337,7 +334,7 @@
                     });
             });
 
-            // Actualiza el select de producto único (Entrada, Descarte, Certificados)
+            // Actualiza el select de producto único (Entrada, Descarte)
             const productoUnicoSelect = document.getElementById('productoSelectUnico');
             if (productoUnicoSelect) {
                 productoUnicoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
@@ -358,41 +355,58 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
-            'Certificados': ['col-certificados']
         };
 
+        // Función para aplicar filtros
+        function aplicarFiltro(tipo) {
+            // Actualizar botones activos
+            document.querySelectorAll('.filtro-movimiento').forEach(b => {
+                b.classList.remove('active');
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
+            });
+
+            const botonActivo = document.querySelector(`[data-tipo="${tipo}"]`);
+            if (botonActivo) {
+                botonActivo.classList.add('active', 'btn-primary');
+                botonActivo.classList.remove('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
+            }
+
+            // Mostrar/ocultar columnas
+            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
+
+            // Ocultar todas las columnas específicas
+            document.querySelectorAll('th, td').forEach(el => {
+                if (el.className.match(/col-(entrada|salida|descarte)/)) {
+                    el.style.display = 'none';
+                }
+            });
+
+            // Mostrar las columnas del tipo seleccionado
+            mostrar.forEach(clase => {
+                document.querySelectorAll('.' + clase).forEach(el => el.style.display = '');
+            });
+
+            // Filtrar filas
+            document.querySelectorAll('.fila-movimiento').forEach(function(row) {
+                if (!tipo || row.getAttribute('data-tipo') === tipo) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Event listeners para los botones de filtro
         document.querySelectorAll('.filtro-movimiento').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const tipo = this.getAttribute('data-tipo');
-                document.querySelectorAll('.filtro-movimiento').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                // Mostrar/ocultar columnas
-                const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte', 'col-certificados'];
-                // Oculta todas
-                document.querySelectorAll('th, td').forEach(el => {
-                    if (el.className.match(/col-(entrada|salida|descarte|certificados)/)) {
-                        el.style.display = 'none';
-                    }
-                });
-                // Muestra las del tipo seleccionado
-                mostrar.forEach(clase => {
-                    document.querySelectorAll('.' + clase).forEach(el => el.style.display = '');
-                });
-
-                // Filtra filas
-                document.querySelectorAll('.fila-movimiento').forEach(function(row) {
-                    if (!tipo || row.getAttribute('data-tipo') === tipo) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+                aplicarFiltro(tipo);
             });
         });
 
-        // Al cargar, muestra todas las columnas
-        document.querySelectorAll('.filtro-movimiento[data-tipo=""]').forEach(btn => btn.click());
+        // Al cargar, aplicar filtro "Todos"
+        aplicarFiltro('');
 
         // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
         @if(isset($producto_id))

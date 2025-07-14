@@ -13,7 +13,6 @@
                 <option value="Entrada" {{ $movimiento->tipo_movimiento == 'Entrada' ? 'selected' : '' }}>Entrada</option>
                 <option value="Salida" {{ $movimiento->tipo_movimiento == 'Salida' ? 'selected' : '' }}>Salida</option>
                 <option value="Descarte" {{ $movimiento->tipo_movimiento == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-                <option value="Certificados" {{ $movimiento->tipo_movimiento == 'Certificados' ? 'selected' : '' }}>Certificados</option>
             </select>
             <input type="hidden" name="tipo_movimiento" value="{{ $movimiento->tipo_movimiento }}">
         </div>
@@ -46,7 +45,7 @@
                 </div>
 
                 <!-- Cantidad -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos certificados-campos d-none">
+                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
                     <label class="form-label">Cantidad</label>
                     <input type="number" name="cantidad" class="form-control" min="1" value="{{ $movimiento->cantidad }}">
                 </div>
@@ -117,39 +116,66 @@
 
 <div class="card">
     <h5 class="card-header">INVENTARIO</h5>
+    <div class="mb-3">
+        <button type="button" class="btn btn-outline-secondary btn-sm filtro-movimiento active" data-tipo="">Todos</button>
+        <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
+        <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
+        <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
+    </div>
     <div class="table-responsive text-nowrap">
         <table class="table table-striped" id="tabla">
             <thead>
                 <tr class="table-dark">
-                    <th>Fecha Entrega</th>
-                    <th>Solicitante</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Vencimiento</th>
-                    <th>Entregado por</th>
-                    <th>Registro</th>
-                    <th>E/S</th>
-
+                    <th class="col-entrada col-salida col-descarte">Clasificación</th>
+                    <th class="col-entrada col-salida col-descarte">Producto</th>
+                    <th class="col-entrada col-salida col-descarte">Cantidad</th>
+                    <th class="col-entrada">Observaciones</th>
+                    <th class="col-entrada col-salida col-descarte">Fecha</th>
+                    <th class="col-salida">Solicitado por</th>
+                    <th class="col-entrada">Fecha de Vencimiento</th>
+                    <th class="col-entrada col-salida col-descarte">E/S/D</th>
+                    <th class="col-salida">Responsable</th>
+                    <th class="col-salida">Evento</th>
+                    <th class="col-descarte">Motivo</th>
+                    <th class="col-entrada">Lote</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody class="table-border-bottom-0">
                 @foreach ($movimientos as $mov)
-                <tr>
-                    <td>{{ $mov->fecha }}</td>
-                    <td>{{ $mov->solicitante->nombre ?? '' }}</td>
-                    <td>{{ $mov->producto->nombre ?? '' }}</td>
-                    <td>{{ $mov->cantidad }}</td>
-                    <td>{{ $mov->fecha_vencimiento }}</td>
-                    <td>{{ $mov->responsable }}</td>
-                    <td>{{ $mov->tipo_movimiento }}</td>
-                    <td>
+                <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->cantidad }}</td>
+                    <td class="col-entrada">{{ $mov->observaciones }}</td>
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->fecha }}</td>
+                    <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
+                    <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
+                    <td class="col-entrada col-salida col-descarte">
                         @if ($mov->tipo_movimiento === 'Entrada')
-                        <span class="badge bg-success">E</span>
-                        @else
-                        <span class="badge bg-danger">S</span>
+                        <span class="badge bg-success">Entrada</span>
+                        @elseif ($mov->tipo_movimiento === 'Descarte')
+                        <span class="badge bg-warning">Descarte</span>
+                        @elseif ($mov->tipo_movimiento === 'Salida')
+                        <span class="badge bg-danger">Salida</span>
                         @endif
                     </td>
-
+                    <td class="col-salida">{{ $mov->responsable }}</td>
+                    <td class="col-salida">{{ $mov->evento }}</td>
+                    <td class="col-descarte">{{ $mov->motivo }}</td>
+                    <td class="col-entrada">{{ $mov->lote }}</td>
+                    <td>
+                        <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('movimiento.destroy', $mov->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estas seguro de que desea eliminar este movimiento?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -171,7 +197,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const tipoRegistro = document.getElementById('tipoRegistro');
         if (tipoRegistro && tipoRegistro.value) {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
+            const tipos = ['entrada', 'salida', 'descarte'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -180,7 +206,7 @@
         }
 
         tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificados'];
+            const tipos = ['entrada', 'salida', 'descarte'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -208,6 +234,64 @@
                     });
             });
         }
+
+        // Mapeo de columnas por tipo
+        const columnasPorTipo = {
+            'Entrada': ['col-entrada'],
+            'Salida': ['col-salida'],
+            'Descarte': ['col-descarte'],
+        };
+
+        // Función para aplicar filtros
+        function aplicarFiltro(tipo) {
+            // Actualizar botones activos
+            document.querySelectorAll('.filtro-movimiento').forEach(b => {
+                b.classList.remove('active');
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
+            });
+            
+            const botonActivo = document.querySelector(`[data-tipo="${tipo}"]`);
+            if (botonActivo) {
+                botonActivo.classList.add('active', 'btn-primary');
+                botonActivo.classList.remove('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
+            }
+
+            // Mostrar/ocultar columnas
+            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
+            
+            // Ocultar todas las columnas específicas
+            document.querySelectorAll('th, td').forEach(el => {
+                if (el.className.match(/col-(entrada|salida|descarte)/)) {
+                    el.style.display = 'none';
+                }
+            });
+            
+            // Mostrar las columnas del tipo seleccionado
+            mostrar.forEach(clase => {
+                document.querySelectorAll('.' + clase).forEach(el => el.style.display = '');
+            });
+
+            // Filtrar filas
+            document.querySelectorAll('.fila-movimiento').forEach(function(row) {
+                if (!tipo || row.getAttribute('data-tipo') === tipo) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Event listeners para los botones de filtro
+        document.querySelectorAll('.filtro-movimiento').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const tipo = this.getAttribute('data-tipo');
+                aplicarFiltro(tipo);
+            });
+        });
+
+        // Al cargar, aplicar filtro "Todos"
+        aplicarFiltro('');
     });
 </script>
 @endsection

@@ -30,6 +30,8 @@ class ProductosImport implements ToModel, WithHeadingRow, WithCustomCsvSettings
         return new Producto([
             'nombre' => $row['nombre'] ?? null,
             'clasificacion_id' => $clasificacion ? $clasificacion->id : null,
+            'stock_actual' => $row['stock_actual'] ?? 0,
+            'stock_minimo' => $row['stock_minimo'] ?? 0,
         ]);
     }
 }

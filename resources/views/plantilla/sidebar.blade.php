@@ -28,28 +28,28 @@
                     </ul>
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="bi bi-box-seam"></i></span><span class="pc-mtext">Bienes</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
-                    <ul class="pc-submenu">
+                    <a href="{{ route('bienes.index') }}" class="pc-link"><span class="pc-micon"><i class="bi bi-box-seam"></i></span><span class="pc-mtext">Bienes</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    {{-- <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Agregar</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Inventario</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Reportes</a></li>
-                    </ul>
+                    </ul> --}}
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="bi bi-layers"></i></i></span><span class="pc-mtext">Materiales</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
-                    <ul class="pc-submenu">
+                    <a href="{{ route('materiales.index') }}" class="pc-link"><span class="pc-micon"><i class="bi bi-layers"></i></i></span><span class="pc-mtext">Materiales</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    {{-- <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Agregar</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Inventario</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Reportes</a></li>
-                    </ul>
+                    </ul> --}}
                 </li>
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link"><span class="pc-micon"><i class="bi bi-cpu"></i></i></span><span class="pc-mtext">Equipos</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
-                    <ul class="pc-submenu">
+                    <a href="{{ route('equipos.index') }}" class="pc-link"><span class="pc-micon"><i class="bi bi-cpu"></i></i></span><span class="pc-mtext">Equipos</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                    {{-- <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="#!">Agregar</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Inventario</a></li>
                         <li class="pc-item"><a class="pc-link" href="#!">Reportes</a></li>
-                    </ul>
+                    </ul> --}}
                 </li>
             </ul>
             <li class="pc-item pc-caption">
@@ -57,21 +57,18 @@
                 <i class="ti ti-news"></i>
             </li>
             <li class="pc-item">
-                <a href="../pages/login.html" class="pc-link">
+                <a href="{{ route('login') }}" class="pc-link">
                     <span class="pc-micon"><i class="ti ti-lock"></i></span>
                     <span class="pc-mtext">Login</span>
                 </a>
             </li>
             <li class="pc-item">
-                <a href="../pages/register.html" class="pc-link">
+                <a href="{{ route('usuario.create') }}" class="pc-link">
                     <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
                     <span class="pc-mtext">Register</span>
                 </a>
             </li>
-            <li class="pc-item pc-caption">
-                <label>Other</label>
-                <i class="ti ti-brand-chrome"></i>
-            </li>
+
             </ul>
         </div>
     </div>

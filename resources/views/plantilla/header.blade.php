@@ -72,7 +72,7 @@
                 <li class="dropdown pc-h-item header-user-profile">
                     <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
                         <img src="{{ asset('images/user/avatar-2.jpg') }}" alt="user-image" class="user-avtar">
-                        <span>Usuario</span>
+                        <span>{{ Auth::user()->nombre ?? 'Usuario' }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
                         <div class="dropdown-header">
@@ -81,10 +81,12 @@
                                     <img src="{{ asset('images/user/avatar-2.jpg') }}" alt="user-image" class="user-avtar wid-35">
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1">Usuario</h6>
-                                    <span>UI/UX Designer</span>
+                                    <h6 class="mb-1">{{ Auth::user()->nombre ?? 'Usuario' }}</h6>
+                                    <span>{{ Auth::user()->email ?? 'Usuario del Sistema' }}</span>
                                 </div>
-                                <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
+                                <a href="{{ route('logout') }}" class="pc-head-link bg-transparent" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="ti ti-power text-danger"></i>
+                                </a>
                             </div>
                         </div>
                         <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
@@ -113,9 +115,9 @@
                                     <i class="ti ti-wallet"></i>
                                     <span>Billing</span>
                                 </a>
-                                <a href="#!" class="dropdown-item">
+                                <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="ti ti-power"></i>
-                                    <span>Logout</span>
+                                    <span>Cerrar Sesión</span>
                                 </a>
                             </div>
                             <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
@@ -147,3 +149,8 @@
         </div>
     </div>
 </header>
+
+<!-- Formulario oculto para logout -->
+<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+    @csrf
+</form>
