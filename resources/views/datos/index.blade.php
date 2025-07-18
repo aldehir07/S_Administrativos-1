@@ -16,116 +16,57 @@
     @endif
 
     <!-- Tarjetas de Estadísticas -->
-    <div class="row mb-4">
-        <div class="col-md-2 mb-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $totalProductos }}</h4>
-                            <p class="card-text">Total Productos</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-boxes fa-2x"></i>
-                        </div>
-                    </div>
+    <div class="row mb-4 g-3">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white bg-primary h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-boxes fa-3x mb-2"></i>
+                    <h4 class="card-title mb-0">{{ $totalProductos }}</h4>
+                    <p class="card-text">Total Productos</p>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-2 mb-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $productosNecesitanReabastecimiento }}</h4>
-                            <p class="card-text">Stock Crítico</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white bg-danger h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-2"></i>
+                    <h4 class="card-title mb-0">{{ $productosNecesitanReabastecimiento }}</h4>
+                    <p class="card-text">Stock Crítico</p>
                 </div>
             </div>
         </div>
-
-        <!-- Nueva tarjeta para Certificados -->
-        <div class="col-md-2 mb-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $stockCertificados ?? 0 }}</h4>
-                            <p class="card-text">Certificados Disponibles</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-certificate fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white bg-success h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-certificate fa-3x mb-2"></i>
+                    <h4 class="card-title mb-0">{{ $stockCertificados ?? 0 }}</h4>
+                    <p class="card-text">Certificados Disponibles</p>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-2 mb-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $certificadosUsados ?? 0 }}</h4>
-                            <p class="card-text">Certificados Usados</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-handshake fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2 mb-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $certificadosAgregados ?? 0 }}</h4>
-                            <p class="card-text">Total Agregados</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-plus-circle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2 mb-3">
-            <div class="card bg-secondary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ $totalCertificados }}</h4>
-                            <p class="card-text">Total Registros</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-list fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white bg-info h-100 shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-handshake fa-3x mb-2"></i>
+                    <h4 class="card-title mb-0">{{ $certificadosUsados ?? 0 }}</h4>
+                    <p class="card-text">Certificados Usados</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Productos en Stock Crítico -->
-        <div class="col-md-6">
-            <div class="card">
+    <!-- Sección de paneles principales en filas separadas -->
+    <div class="row g-4">
+        <!-- Productos en Stock Crítico (fila completa) -->
+        <div class="col-12">
+            <div class="card h-100 shadow-sm">
                 <div class="card-header bg-danger text-white">
                     <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Productos en Stock Crítico</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         @forelse($productosCriticos as $producto)
-                        <div class="col-md-6 mb-3">
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="card border-danger shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
@@ -139,7 +80,6 @@
                                             <small class="text-muted">{{ $producto->clasificacion->nombre ?? 'N/A' }}</small>
                                         </div>
                                     </div>
-
                                     <div class="row text-center">
                                         <div class="col-4">
                                             <div class="border-end">
@@ -158,7 +98,6 @@
                                             <span class="fw-bold text-danger">{{ max(0, $producto->stock_minimo - $producto->stock_actual) }}</span>
                                         </div>
                                     </div>
-
                                     <div class="mt-2">
                                         <div class="progress" style="height: 8px;">
                                             @php
@@ -189,10 +128,9 @@
                 </div>
             </div>
         </div>
-
-        <!-- Certificados Recientes -->
-        <div class="col-md-6">
-            <div class="card">
+        <!-- Últimos Certificados Usados (fila completa) -->
+        <div class="col-12">
+            <div class="card h-100 shadow-sm">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-certificate"></i> Últimos Certificados Usados</h5>
                 </div>
@@ -236,39 +174,40 @@
                         </a>
                     </div>
                     @endif
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Panel lateral con información adicional -->
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <!-- Productos por Clasificación -->
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-pie"></i> Productos por Clasificación</h6>
+    <!-- Panel lateral con información adicional -->
+    <div class="row mt-4 g-4">
+        <div class="col-12 col-lg-8">
+            <!-- Aquí puedes agregar futuras secciones o gráficos -->
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card border-success mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-certificate"></i> Estado de Certificados</h6>
                 </div>
                 <div class="card-body">
-                    @foreach($productosPorClasificacion as $item)
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold">{{ $item->clasificacion->nombre ?? 'Sin clasificación' }}</span>
-                        <span class="badge bg-primary">{{ $item->total }}</span>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-success">{{ $stockCertificados ?? 0 }}</h5>
+                            <small class="text-muted">Disponibles</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-warning">{{ $certificadosUsados ?? 0 }}</h5>
+                            <small class="text-muted">Usados</small>
+                        </div>
                     </div>
-                    <div class="progress mb-3" style="height: 6px;">
-                        @php
-                            $porcentaje = $totalProductos > 0 ? ($item->total / $totalProductos) * 100 : 0;
-                        @endphp
-                        <div class="progress-bar bg-info" style="width: {{ $porcentaje }}%"></div>
+                    @if(($stockCertificados ?? 0) < 50)
+                    <div class="alert alert-warning mt-2 mb-0 py-2">
+                        <small><i class="fas fa-exclamation-triangle"></i> Stock bajo de certificados</small>
                     </div>
-                    @endforeach
-                </div>
+                    @endif
                 </div>
             </div>
-
-            <!-- Últimos Movimientos -->
-        <div class="col-md-4">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h6 class="mb-0"><i class="fas fa-history"></i> Últimos Movimientos</h6>
                 </div>
@@ -294,68 +233,6 @@
                     @empty
                     <p class="text-muted text-center">No hay movimientos recientes</p>
                     @endforelse
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alertas adicionales -->
-    {{-- <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0"><i class="fas fa-clock"></i> Productos Sin Movimiento (30 días)</h6>
-                </div>
-                <div class="card-body">
-                    <div class="text-center">
-                        <h3 class="text-warning">{{ $productosSinMovimiento }}</h3>
-                        <p class="text-muted">productos sin actividad reciente</p>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-
-        {{-- <div class="col-md-4">
-            <div class="card border-info">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-line"></i> Resumen de Stock</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <h5 class="text-success">{{ $productosStockExcesivo }}</h5>
-                            <small class="text-muted">Stock Excesivo</small>
-                        </div>
-                        <div class="col-6">
-                            <h5 class="text-danger">{{ $productosSinStock }}</h5>
-                            <small class="text-muted">Sin Stock</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-
-        <div class="col-md-4">
-            <div class="card border-success">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="fas fa-certificate"></i> Estado de Certificados</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <h5 class="text-success">{{ $stockCertificados ?? 0 }}</h5>
-                            <small class="text-muted">Disponibles</small>
-                        </div>
-                        <div class="col-6">
-                            <h5 class="text-warning">{{ $certificadosUsados ?? 0 }}</h5>
-                            <small class="text-muted">Usados</small>
-                        </div>
-                    </div>
-                    @if(($stockCertificados ?? 0) < 50)
-                    <div class="alert alert-warning mt-2 mb-0 py-2">
-                        <small><i class="fas fa-exclamation-triangle"></i> Stock bajo de certificados</small>
-                    </div>
-                    @endif
                 </div>
             </div>
         </div>

@@ -2,8 +2,8 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
         <div class="m-header">
-            <a href="../dashboard/index.html" class="b-brand text-primary">
-                <img src="{{ asset('images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="logo">
+            <a href="{{ route('datos.index') }}" class="b-brand text-primary">
+                <img src="{{ asset('logo/SIDSA.PNG') }}" class="img-fluid logo-lg" alt="logo">
             </a>
         </div>
         <div class="navbar-content">
@@ -15,7 +15,7 @@
                     </a>
                 </li>
                 <li class="pc-item pc-caption">
-                    <label>UI Components</label>
+                    <label>Secciones</label>
                     <i class="ti ti-dashboard"></i>
                 </li>
                 <li class="pc-item pc-hasmenu">
@@ -53,7 +53,7 @@
                 </li>
             </ul>
             <li class="pc-item pc-caption">
-                <label>Pages</label>
+                <label>Usuario</label>
                 <i class="ti ti-news"></i>
             </li>
             <li class="pc-item">

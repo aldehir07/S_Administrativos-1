@@ -453,17 +453,17 @@ function layout_change(layout) {
   if (layout == 'dark') {
     dark_flag = true;
     if (document.querySelector('.pc-sidebar .m-header .logo-lg')) {
-      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '../assets/images/logo-white.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
 
     if (document.querySelector('.navbar-brand .logo-lg')) {
-      document.querySelector('.navbar-brand .logo-lg').setAttribute('src', '../assets/images/logo-white.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     if (document.querySelector('.auth-main.v1 .auth-sidefooter')) {
-      document.querySelector('.auth-main.v1 .auth-sidefooter img').setAttribute('src', '../assets/images/logo-white.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     if (document.querySelector('.footer-top .footer-logo')) {
-      document.querySelector('.footer-top .footer-logo').setAttribute('src', '../assets/images/logo-white.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     var control = document.querySelector('.theme-layout > a.active');
     if (control) {
@@ -473,16 +473,16 @@ function layout_change(layout) {
   } else {
     dark_flag = false;
     if (document.querySelector('.pc-sidebar .m-header .logo-lg')) {
-      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '../assets/images/logo-dark.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     if (document.querySelector('.navbar-brand .logo-lg')) {
-      document.querySelector('.navbar-brand .logo-lg').setAttribute('src', '../assets/images/logo-dark.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     if (document.querySelector('.auth-main.v1 .auth-sidefooter')) {
-      document.querySelector('.auth-main.v1 .auth-sidefooter img').setAttribute('src', '../assets/images/logo-dark.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     if (document.querySelector('.footer-top .footer-logo')) {
-      document.querySelector('.footer-top .footer-logo').setAttribute('src', '../assets/images/logo-dark.svg');
+      document.querySelector('.pc-sidebar .m-header .logo-lg').setAttribute('src', '/logo/SIDSA.PNG');
     }
     var control = document.querySelector('.theme-layout > a.active');
     if (control) {

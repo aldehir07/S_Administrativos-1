@@ -1,6 +1,12 @@
 @extends('layouts.app')
 @section('content')
+
 <div class="container">
+    <div class="card">
+        <div class="card-tittle bg-warning text-dark">
+
+        </div>
+    </div>
     <h2 class="mb-4">Registrar Movimiento de Inventario</h2>
     @if(session('alerta_stock'))
     <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">

@@ -2,74 +2,88 @@
 @section('content')
 
 <div class="container">
-    <h2 class="mb-4">Agregar Producto</h2>
-
-    <form method="POST" action="{{ route('producto.store') }}" enctype="multipart/form-data">
-        @csrf
-        @method('POST')
-        <div class="row">
-            <!-- Columna Izquierda -->
-            <div class="col-md-6">
-
-                <!-- Clasificación -->
-                <div class="mb-3 ">
-                    <label class="form-label">Clasificación</label>
-                    <select name="clasificacion_id" class="form-select">
-                        <option value="" disabled selected>Seleccione</option>
-                        @foreach ($clasificaciones as $clasificacion)
-                            <option value="{{ $clasificacion->id }}">{{ $clasificacion->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Nombre Producto -->
-                <div class="mb-3">
-                    <label class="form-label">Nombre del producto</label>
-                    <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}">
-                </div>
-
-                <!-- Imagen -->
-                <div class="mb-3">
-                    <label class="form-label">Imagen</label>
-                    <input type="file" name="imagen" class="form-control" accept="image/*" id=imagenInput>
-                    <div class="mt-2">
-                        <img id="previewImagen" src="#" alt="vista previa" style="max-width: 150px; display: none;">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Columna Derecha -->
-            <div class="col-md-6">
-
-                <div class="mb-3">
-                    <label class="form-label">Stock Minimo</label>
-                    <input type="number" name="stock_minimo" class="form-control" value="{{ old('stock_minimo') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Stock Actual</label>
-                    <input type="number" name="stock_actual" class="form-control" value="{{ old('stock_actual', 0) }}">
-                </div>
-             
-            </div>
-        </div>
-
-        <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary">Registrar Producto</button>
-        </div>
-    </form>
-
-    <!-- Tanla de insumos registrados -->
-    <div class="mt-5">
-        <h4>Listado de Insumos</h4>
-        @if (session('success'))
+    
+    @if (session('success'))
         <div class="alert alert-success">
             {{session('success')}}
         </div>
-        @endif
+    @endif
+
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h2 class="card-tittle mb-0">Agregar Producto</h2>
+        </div>
+
+        <div class="card-body">
+            <form method="POST" action="{{ route('producto.store') }}" enctype="multipart/form-data">
+            @csrf
+            @method('POST')
+            <div class="row">
+                <!-- Columna Izquierda -->
+                <div class="col-md-6">
+
+                    <!-- Clasificación -->
+                    <div class="mb-3 ">
+                        <label class="form-label">Clasificación</label>
+                        <select name="clasificacion_id" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            @foreach ($clasificaciones as $clasificacion)
+                                <option value="{{ $clasificacion->id }}">{{ $clasificacion->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Nombre Producto -->
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del producto</label>
+                        <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}">
+                    </div>
+
+                    <!-- Imagen -->
+                    <div class="mb-3">
+                        <label class="form-label">Imagen</label>
+                        <input type="file" name="imagen" class="form-control" accept="image/*" id=imagenInput>
+                        <div class="mt-2">
+                            <img id="previewImagen" src="#" alt="vista previa" style="max-width: 150px; display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label class="form-label">Stock Minimo</label>
+                        <input type="number" name="stock_minimo" class="form-control" value="{{ old('stock_minimo') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Stock Actual</label>
+                        <input type="number" name="stock_actual" class="form-control" value="{{ old('stock_actual', 0) }}">
+                    </div>
+                
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary">Registrar Producto</button>
+            </div>
+        </form>
+        </div>
+    </div>
+    
+
+ 
+
+    <!-- Tanla de insumos registrados -->
+    <div class="card mt-5">
+        <div class="card-header bg-info text-white">
+            <h4 class="card-tittle mb-0">Listado de Insumos</h4>
+        </div>
+        
         <table class="table table-hover table-striped" id="tabla">
             <thead>
-                <tr class="table-dark">
+                <tr class="table-info">
                     <th>ID</th>
                     <th>Imagen</th>
                     <th>Clasificacion</th>
