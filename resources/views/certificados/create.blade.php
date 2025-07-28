@@ -2,72 +2,78 @@
 @section('content')
 
 <div class="container">
-    <h2 class="mb-4">Control de Certificados</h2>
-
-    <!-- Mensajes de alerta -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <div class="row">
-        <!-- Formulario para registrar certificados usados -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0">Registrar Certificados Usados</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('certificados.store') }}" method="post">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label">Fecha del Evento</label>
-                            <input type="date" name="fecha" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Cantidad Usada</label>
-                            <input type="number" name="cantidad" class="form-control" min="1" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Nombre del Evento</label>
-                            <input type="text" name="evento" class="form-control" placeholder="Ej: Conferencia de Tecnología" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Responsable</label>
-                            <input type="text" name="responsable" class="form-control" placeholder="Quien solicitó los certificados" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-warning">Registrar Uso</button>
-                    </form>
-                </div>
+        <!-- Mensajes de alerta -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+    <div class="card">
+        <div class="card-header" style="background:#082140;">
+            <h2 class="card-tittle mb-0 text-white"><i class="fas fa-certificate"></i> Control de Certificados</h2>
         </div>
 
-        <!-- Card para agregar al stock -->
-        <div class="col-md-6">
-            <div class="card text-center">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Stock Actual</h5>
-                </div>
-                <div class="card-body">
-                    <h2 class="display-4 text-primary">{{ $stockTotal ?? 0 }}</h2>
-                    <p class="card-text">Certificados disponibles en inventario</p>
+        <div class="card-body">
+                <div class="row">
+                <!-- Formulario para registrar certificados usados -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="background:#3177bf">
+                            <h5 class="card-title mb-0 text-white">Registrar Certificados Usados</h5>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('certificados.store') }}" method="post">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha del Evento</label>
+                                    <input type="date" name="fecha" class="form-control" required>
+                                </div>
 
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregarStockModal">
-                        Agregar al Stock
-                    </button>
+                                <div class="mb-3">
+                                    <label class="form-label">Cantidad Usada</label>
+                                    <input type="number" name="cantidad" class="form-control" min="1" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del Evento</label>
+                                    <input type="text" name="evento" class="form-control" placeholder="Ej: Conferencia de Tecnología" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Responsable</label>
+                                    <input type="text" name="responsable" class="form-control" placeholder="Quien solicitó los certificados" required>
+                                </div>
+
+                                <button type="submit" class="btn text-white" style="background:#3177bf">Registrar Uso</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card para agregar al stock -->
+                <div class="col-md-6">
+                    <div class="card text-center card-stock-bg">
+                        <div class="card-header" style="background:#3177bf">
+                            <h5 class="card-title mb-0 text-white">Stock Actual</h5>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="display-4 text-primary">{{ $stockTotal ?? 0 }}</h2>
+                            <p class="card-text">Certificados disponibles en inventario</p>
+
+                            <button type="button" class="btn text-white" data-bs-toggle="modal" data-bs-target="#agregarStockModal" style="background:#3177bf">
+                                Agregar al Stock
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,8 +81,8 @@
 
     <!-- Tabla de Certificados Usados -->
     <div class="card mt-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="card-title mb-0">Historial de Certificados Usados</h5>
+        <div class="card-header" style="background:#3177bf">
+            <h5 class="card-title mb-0 text-white"> <i class="fas fa-list"></i> Historial de Certificados Usados</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">

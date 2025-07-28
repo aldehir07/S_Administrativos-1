@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reporte;
+use App\Models\Movimiento;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 
 class ReporteController extends Controller
@@ -10,9 +12,46 @@ class ReporteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Movimiento::query()->with('producto');
+
+        if($request->filled('desde')){
+            $query->where('fecha', '>=', $request->desde);
+        }
+        if($request->filled('hasta')){
+            $query->where('fecha', '<=', $request->hasta);
+        }
+        if($request->filled('producto_id')){
+            $query->where('producto_id', $request->producto_id);
+        }
+        if($request->filled('tipo_movimiento')){
+            $query->where('tipo_movimiento', $request->tipo_movimiento);
+        }
+
+        $movimientos = $query->orderBy('fecha', 'desc')->get();
+        $productos = Producto::orderBy('nombre')->get();
+
+        // Filtros de fecha
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+
+        // Consulta para productos más utilizados
+        $productosMasUsados = Movimiento::selectRaw('producto_id, SUM(cantidad) as total_usada')
+            ->when($desde, function($query) use ($desde) {
+                $query->where('fecha', '>=', $desde);
+            })
+            ->when($hasta, function($query) use ($hasta) {
+                $query->where('fecha', '<=', $hasta);
+            })
+            ->where('tipo_movimiento', 'Salida') // Solo salidas, puedes ajustar si quieres incluir otros tipos
+            ->groupBy('producto_id')
+            ->orderByDesc('total_usada')
+            ->with('producto')
+            ->take(10) // Top 10
+            ->get();
+
+        return view('reportes.index', compact('movimientos', 'productos', 'productosMasUsados'));
     }
 
     /**

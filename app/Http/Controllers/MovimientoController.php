@@ -154,4 +154,5 @@ class MovimientoController extends Controller
         $movimiento->delete();
         return redirect()->route('movimiento.create')->with('success', 'Movimiento eliminado del incentario exitosamente!.');
     }
+
 }

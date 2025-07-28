@@ -2,14 +2,15 @@
 @section('content')
 
 <div class="container">
-    <div class="card">
-        <div class="card-header bg-warning text-dark">
-            <h2 class="card-tittle mb-0">Editar Producto</h2>
             @if (session('success'))
             <div class="alert alert-success">
                 {{session('success')}}
             </div>
-        @endif
+            @endif
+    <div class="card">
+        <div class="card-header" style="background:#082140;">
+            <h2 class="card-tittle mb-0 text-white"> <i class="fas fa-edit"></i> Editar Producto</h2>
+            
         </div>
 
         <div class="card-body">
@@ -83,8 +84,8 @@
     
     <!-- Tanla de insumos registrados -->
     <div class="card mt-5">
-        <div class="card-header bg-info text-white">
-            <h5 class="card-tittle mb-0">Listado de Insumos</h4>
+        <div class="card-header" style="background:#3177bf">
+            <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Listado de Insumos</h4>
         </div>
 
         <div class="card-body">

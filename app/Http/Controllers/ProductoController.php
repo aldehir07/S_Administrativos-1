@@ -6,7 +6,9 @@ use App\Imports\ProductosImport;
 use App\Models\Clasificacion;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\View;
 
 class ProductoController extends Controller
 {
@@ -124,4 +126,5 @@ class ProductoController extends Controller
         $productos = Producto::where('clasificacion_id', $clasificacion_id)->get();
         return response()->json($productos);
     }
+
 }

@@ -2,12 +2,8 @@
 @section('content')
 
 <div class="container">
-    <div class="card">
-        <div class="card-tittle bg-warning text-dark">
+    
 
-        </div>
-    </div>
-    <h2 class="mb-4">Registrar Movimiento de Inventario</h2>
     @if(session('alerta_stock'))
     <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">
         <i class="fas fa-exclamation-triangle"></i>
@@ -21,171 +17,188 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('movimiento.store') }}">
-        @csrf
-
-        <!-- Tipo de Registro -->
-        <div class="mb-4">
-            <label class="form-label fw-bold">Tipo de Registro</label>
-            <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
-                <option value="" {{ !old('tipo_movimiento') && !isset($producto_id) ? 'selected' : '' }}>Seleccione</option>
-                <option value="Entrada"
-                    {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>
-                    Entrada</option>
-                <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
-                <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-            </select>
+    <div class="card">
+        <div class="card-header" style="background:#082140;">
+            <h2 class="card-tittle mb-0 text-white"> <i class="fas fa-plus-circle"></i> Registrar Movimiento de Inventario</h2>
         </div>
 
-        <div class="row">
-            <!-- Columna Izquierda -->
-            <div class="col-md-6">
+        <div class="card-body">
+        <form method="POST" action="{{ route('movimiento.store') }}">
+            @csrf
 
-                <!-- Clasificación -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
-                    <label class="form-label">Clasificación</label>
-                    <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
-                        <option value="" disabled>Seleccione</option>
-                        @foreach ($clasificaciones as $clasificacion)
-                        <option value="{{ $clasificacion->id }}"
-                            {{ (isset($producto_id) && $productos->find($producto_id)?->clasificacion_id == $clasificacion->id) ? 'selected' : '' }}>
-                            {{ $clasificacion->nombre }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
+            <!-- Tipo de Registro -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Tipo de Registro</label>
+                <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
+                    <option value="" {{ !old('tipo_movimiento') && !isset($producto_id) ? 'selected' : '' }}>Seleccione</option>
+                    <option value="Entrada"
+                        {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>
+                        Entrada</option>
+                    <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
+                    <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
+                </select>
+            </div>
 
-                <!-- Productos dinámicos para Salida -->
-                <div class="mb-3 salida-campos d-none" id="productosSalidaContainer">
-                    <label class="form-label">Productos y Cantidades</label>
-                    <div id="productosSalidaRows">
-                        <div class="row mb-2 producto-salida-row">
-                            <div class="col-8">
-                                <select name="productos_salida[]" class="form-select producto-salida-select">
-                                    <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
-                                    @foreach ($productos as $producto)
-                                    <option value="{{ $producto->id }}" {{ (isset($producto_id) && $producto_id == $producto->id) ? 'selected' : '' }}>
-                                        {{ $producto->nombre }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-3">
-                                <input type="number" name="cantidades_salida[]" class="form-control" min="1" placeholder="Cantidad">
-                            </div>
-                            <div class="col-1 d-flex align-items-center">
-                                <button type="button" class="btn btn-danger btn-sm remove-producto-salida" title="Quitar">
-                                    &times;
-                                </button>
+            <div class="row">
+                <!-- Columna Izquierda -->
+                <div class="col-md-6">
+                    <!-- Clasificación -->
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                        <label class="form-label">Clasificación</label>
+                        <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
+                            <option value="" disabled>Seleccione</option>
+                            @foreach ($clasificaciones as $clasificacion)
+                            <option value="{{ $clasificacion->id }}"
+                                {{ (isset($producto_id) && $productos->find($producto_id)?->clasificacion_id == $clasificacion->id) ? 'selected' : '' }}>
+                                {{ $clasificacion->nombre }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Productos dinámicos para Salida -->
+                    <div class="mb-3 salida-campos d-none" id="productosSalidaContainer">
+                        <label class="form-label">Productos y Cantidades</label>
+                        <div id="productosSalidaRows">
+                            <div class="row mb-2 producto-salida-row">
+                                <div class="col-8">
+                                    <select name="productos_salida[]" class="form-select producto-salida-select">
+                                        <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
+                                        @foreach ($productos as $producto)
+                                        <option value="{{ $producto->id }}" {{ (isset($producto_id) && $producto_id == $producto->id) ? 'selected' : '' }}>
+                                            {{ $producto->nombre }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" name="cantidades_salida[]" class="form-control" min="1" placeholder="Cantidad">
+                                </div>
+                                <div class="col-1 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-producto-salida" title="Quitar">
+                                        &times;
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="agregarProductoSalida">Agregar otro producto</button>
                     </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="agregarProductoSalida">Agregar otro producto</button>
+
+                    <!-- Producto para Entrada, Descarte -->
+                    <div class="mb-3 entrada-campos descarte-campos d-none">
+                        <label class="form-label">Producto</label>
+                        <select name="producto_id" id="productoSelectUnico" class="form-select">
+                            <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
+                            @foreach ($productos as $producto)
+                            <option value="{{ $producto->id }}" {{ (isset($producto_id) && $producto->id == $producto_id) ? 'selected' : '' }}>
+                                {{ $producto->nombre }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div class="mb-3 entrada-campos descarte-campos  d-none">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" name="cantidad" class="form-control" min="1">
+                    </div>
+
+                    <!-- Evento/Destino -->
+                    <div class="mb-3 salida-campos  d-none">
+                        <label class="form-label">Evento / Destino</label>
+                        <input type="text" name="evento" class="form-control">
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="mb-3 entrada-campos d-none">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="observaciones" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
 
-                <!-- Producto para Entrada, Descarte -->
-                <div class="mb-3 entrada-campos descarte-campos d-none">
-                    <label class="form-label">Producto</label>
-                    <select name="producto_id" id="productoSelectUnico" class="form-select">
-                        <option value="" disabled selected>Seleccione un producto</option>
-                        @foreach ($productos as $producto)
-                        <option value="{{ $producto->id }}">{{ $producto->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
 
-                <!-- Cantidad -->
-                <div class="mb-3 entrada-campos descarte-campos  d-none">
-                    <label class="form-label">Cantidad</label>
-                    <input type="number" name="cantidad" class="form-control" min="1">
-                </div>
+                    <!-- Fecha -->
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" name="fecha" class="form-control" required>
+                    </div>
 
-                <!-- Evento/Destino -->
-                <div class="mb-3 salida-campos  d-none">
-                    <label class="form-label">Evento / Destino</label>
-                    <input type="text" name="evento" class="form-control">
-                </div>
+                    <!-- Lote -->
+                    <div class="mb-3 entrada-campos d-none">
+                        <label class="form-label">Lote</label>
+                        <input type="text" name="lote" class="form-control">
+                    </div>
 
-                <!-- Observaciones -->
-                <div class="mb-3 entrada-campos d-none">
-                    <label class="form-label">Observaciones</label>
-                    <textarea name="observaciones" class="form-control" rows="2"></textarea>
+                    <!-- Fecha de Vencimiento -->
+                    <div class="mb-3 entrada-campos d-none">
+                        <label class="form-label">Fecha de Vencimiento</label>
+                        <input type="date" name="fecha_vencimiento" class="form-control">
+                    </div>
+
+                    <!-- Solicitado Por -->
+                    <div class="mb-3 salida-campos  d-none">
+                        <label class="form-label">Solicitado por</label>
+                        <select name="solicitante_id" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            @foreach($solicitantes as $solicitante)
+                            <option value="{{ $solicitante->id }}">{{ $solicitante->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Responsable -->
+                    <div class="mb-3 salida-campos d-none">
+                        <label class="form-label">Responsable</label>
+                        <select name="responsable" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            <option value="Arline Tuñon">Arline Tuñon</option>
+                            <option value="Luis Urriola">Luis Urriola</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Motivo de Descarte -->
+                    <div class="mb-3 descarte-campos d-none">
+                        <label class="form-label">Motivo de Descarte</label>
+                        <select name="motivo" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            <option value="Dañado">Dañado</option>
+                            <option value="Vencido">Vencido</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- Columna Derecha -->
-            <div class="col-md-6">
-
-                <!-- Fecha -->
-                <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
-                    <label class="form-label">Fecha</label>
-                    <input type="date" name="fecha" class="form-control" required>
-                </div>
-
-                <!-- Lote -->
-                <div class="mb-3 entrada-campos d-none">
-                    <label class="form-label">Lote</label>
-                    <input type="text" name="lote" class="form-control">
-                </div>
-
-                <!-- Fecha de Vencimiento -->
-                <div class="mb-3 entrada-campos d-none">
-                    <label class="form-label">Fecha de Vencimiento</label>
-                    <input type="date" name="fecha_vencimiento" class="form-control">
-                </div>
-
-                <!-- Solicitado Por -->
-                <div class="mb-3 salida-campos  d-none">
-                    <label class="form-label">Solicitado por</label>
-                    <select name="solicitante_id" class="form-select">
-                        <option value="" disabled selected>Seleccione</option>
-                        @foreach($solicitantes as $solicitante)
-                        <option value="{{ $solicitante->id }}">{{ $solicitante->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Responsable -->
-                <div class="mb-3 salida-campos d-none">
-                    <label class="form-label">Responsable</label>
-                    <select name="responsable" class="form-select">
-                        <option value="" disabled selected>Seleccione</option>
-                        <option value="Arline Tuñon">Arline Tuñon</option>
-                        <option value="Luis Urriola">Luis Urriola</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
-
-                <!-- Motivo de Descarte -->
-                <div class="mb-3 descarte-campos d-none">
-                    <label class="form-label">Motivo de Descarte</label>
-                    <select name="motivo" class="form-select">
-                        <option value="" disabled selected>Seleccione</option>
-                        <option value="Dañado">Dañado</option>
-                        <option value="Vencido">Vencido</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
             </div>
+        </form>
+        </div>
+    </div>
+
+    
+
+    <div class="card mt-5">
+
+        <div class="card-header" style="background:#3177bf">
+            <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Registro de Movimientos</h4>
         </div>
 
-        <div class="text-end mt-4">
-            <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
-        </div>
-    </form>
-
-    <div class="card">
-        <h5 class="card-header">INVENTARIO</h5>
+    <div class="card-body">
         <div class="mb-3">
             <button type="button" class="btn btn-outline-secondary btn-sm filtro-movimiento active" data-tipo="">Todos</button>
             <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
             <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
             <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
         </div>
+
         <div class="table-responsive text-nowrap">
-            <table class="table" id="tabla">
+            <table class="table table-hover table-striped" id="tabla">
                 <thead>
-                    <tr>
+                    <tr class="table-info">
                         <th class="col-entrada col-salida col-descarte">Clasificación</th>
                         <th class="col-entrada col-salida col-descarte">Producto</th>
                         <th class="col-entrada col-salida col-descarte">Cantidad</th>
@@ -241,6 +254,8 @@
                 </tbody>
             </table>
         </div>
+    </div>
+        
     </div>
 </div>
 

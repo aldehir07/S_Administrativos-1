@@ -1,11 +1,11 @@
-<title>Sistema Inventario S.Ad</title>
+<title>Sistema Inventario S.D.A</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="Mantis is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
-<meta name="keywords" content="Mantis, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
-<meta name="author" content="CodedThemes">
-<link rel="icon" href="{{ asset('images/favicon.svg') }}" type="image/x-icon">
+<meta name="description" content="SISA fue creado para la gestion de inventario de la UST-ACG.">
+<meta name="keywords" content="UST - Sistema de gestion de inventario">
+<meta name="author" content="UST-ACG">
+<link rel="icon" href="{{ asset('logo/ACG-BLANCO.png') }}" type="image/x-icon">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
 <link rel="stylesheet" href="{{ asset('fonts/tabler-icons.min.css') }}">
 <link rel="stylesheet" href="{{ asset('fonts/feather.css') }}">

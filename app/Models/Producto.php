@@ -12,7 +12,8 @@ class Producto extends Model
         'clasificacion_id',
         'imagen',
         'stock_actual',
-        'stock_minimo'
+        'stock_minimo',
+        
     ];
 
     public function clasificacion(){

@@ -10,8 +10,8 @@
     @endif
 
     <div class="card">
-        <div class="card-header bg-warning text-dark">
-            <h2 class="card-tittle mb-0">Agregar Producto</h2>
+        <div class="card-header" style="background:#082140">
+            <h2 class="card-tittle mb-0 text-white"> <i class="fas fa-plus-circle"></i> Agregar Producto</h2>
         </div>
 
         <div class="card-body">
@@ -72,13 +72,10 @@
         </div>
     </div>
     
-
- 
-
     <!-- Tanla de insumos registrados -->
     <div class="card mt-5">
-        <div class="card-header bg-info text-white">
-            <h4 class="card-tittle mb-0">Listado de Insumos</h4>
+        <div class="card-header" style="background:#3177bf">
+            <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Listado de Productos</h4>
         </div>
         
         <table class="table table-hover table-striped" id="tabla">

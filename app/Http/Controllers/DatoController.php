@@ -15,12 +15,36 @@ class DatoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Productos en stock crítico
         $productosCriticos = Producto::with('clasificacion')
             ->whereColumn('stock_actual', '<=', 'stock_minimo')
             ->get();
+
+        // Productos vencidos y próximos a vencer
+        $productosVencidos = Movimiento::with(['producto.clasificacion'])
+            ->whereNotNull('fecha_vencimiento')
+            ->where('fecha_vencimiento', '<', Carbon::now())
+            ->where('tipo_movimiento', 'Entrada')
+            ->get()
+            ->unique('producto_id')
+            ->map(function($movimiento) {
+                return $movimiento->producto;
+            })
+            ->filter();
+
+        $productosProximosVencer = Movimiento::with(['producto.clasificacion'])
+            ->whereNotNull('fecha_vencimiento')
+            ->where('fecha_vencimiento', '>=', Carbon::now())
+            ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(30))
+            ->where('tipo_movimiento', 'Entrada')
+            ->get()
+            ->unique('producto_id')
+            ->map(function($movimiento) {
+                return $movimiento->producto;
+            })
+            ->filter();
 
         // Estadísticas generales
         $totalCertificados = Certificado::count();
@@ -57,8 +81,29 @@ class DatoController extends Controller
             ->take(10)
             ->get();
 
+        //Filtros de fecha
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+        
+        // Consulta para productos más utilizados
+        $productosMasUsados = Movimiento::selectRaw('producto_id, SUM(cantidad) as total_usada')
+            ->when($desde, function($query) use ($desde) {
+                $query->where('fecha', '>=', $desde);
+            })
+            ->when($hasta, function($query) use ($hasta) {
+                $query->where('fecha', '<=', $hasta);
+            })
+            ->where('tipo_movimiento', 'Salida') // Solo salidas, puedes ajustar si quieres incluir otros tipos
+            ->groupBy('producto_id')
+            ->orderByDesc('total_usada')
+            ->with('producto')
+            ->take(10) // Top 10
+            ->get();
+
         return view('datos.index', compact(
             'productosCriticos',
+            'productosVencidos',
+            'productosProximosVencer',
             'totalProductos',
             'productosSinStock',
             'productosStockExcesivo',
@@ -70,7 +115,8 @@ class DatoController extends Controller
             'stockCertificados',
             'certificadosUsados',
             'certificadosAgregados',
-            'ultimosCertificadosUsados'
+            'ultimosCertificadosUsados',
+            'productosMasUsados',
         ));
     }
 

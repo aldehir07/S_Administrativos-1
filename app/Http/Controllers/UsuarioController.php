@@ -6,63 +6,84 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class UsuarioController extends Controller
 {
-
-    public function index(){
-
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
     }
-    
+
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         return view('usuario.create');
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-
         Usuario::create([
-            'nombre' => $request->nombre,
-            'password' => bcrypt($request->password),
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
         ]);
-        return redirect()->route('login')->with('success', 'Usuario creado exitosamente');
+        return redirect(route('login'))->with('mensaje', 'Se ha registrado exitosamente!.');
     }
 
-    
     public function loginfrm(){
         return view('login');
     }
 
-
     public function login(Request $request){
-        $credentials = $request->only('nombre', 'password');
-        
-        if(Auth::attempt($credentials)){
+        if(Auth::attempt(['name' => $request->name, 'password' => $request->password])){
             session(['role' => Auth::user()->role]);
-            return redirect()->route('datos.index')->with('success', 'Inicio de sesión exitoso');
+            return redirect(route('datos.index'));
         }
-        return back()->with('error', 'Error al iniciar sesion, verifique sus credenciales.');
+        return back()->with('mensaje', 'Error al iniciar session, verifique sus credenciales.');
     }
 
     public function logout(){
         Auth::logout();
-        return redirect()->route('login')->with('success', 'Sesion cerrada exitosamente');
+        return redirect(route('login'))->with('mensaje', 'Sesion Cerrada.');
     }
 
-    public function show(){
-
+    /**
+     * 
+     * Display the specified resource.
+     */
+    public function show(Usuario $usuario)
+    {
+        //
     }
 
-    public function edit(){
-        
-    }
-    public function update(){
-        
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Usuario $usuario)
+    {
+        //
     }
 
-    public function destroy(){
-        
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Usuario $usuario)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Usuario $usuario)
+    {
+        //
     }
 }

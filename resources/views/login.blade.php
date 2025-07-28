@@ -1,12 +1,12 @@
-@extends('layouts.auth')
+@extends('layouts.app')
 @section('content')
 <div class="container" style="max-width: 420px;">
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <h4 class="mb-4 text-center">Iniciar Sesión</h4>
-            @if (session('success'))
+            @if (session('mensaje'))
                 <div class="alert alert-warning" role="alert">
-                    {{ session('success')}}
+                    {{ session('mensaje')}}
                 </div>
             @endif
             @if(session('error'))
@@ -16,7 +16,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Nombre</label>
-                    <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}" required autofocus>
+                    <input type="text" name="name" class="form-control" value="{{ old('nombre') }}" required autofocus>
                 </div>
                 <div class="mb-3 position-relative">
                     <label class="form-label">Contraseña</label>
