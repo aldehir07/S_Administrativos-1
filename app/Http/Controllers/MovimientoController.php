@@ -23,7 +23,9 @@ class MovimientoController extends Controller
      */
     public function create(Request $request)
     {
+        
         $movimientos = Movimiento::with(['producto', 'solicitante'])->latest()->get();
+        // dd($movimientos);
         $clasificaciones = Clasificacion::all();
         $productos = Producto::with('clasificacion')->get();
         $solicitantes = Solicitante::all();
@@ -34,10 +36,11 @@ class MovimientoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    
     public function store(Request $request)
     {
         if ($request->tipo_movimiento == "Salida") {
-            // Validación para Salida
+            // Validación para Salida múltiple
             $request->validate([
                 'productos_salida' => 'required|array|min:1',
                 'cantidades_salida' => 'required|array|min:1',
@@ -45,25 +48,54 @@ class MovimientoController extends Controller
                 'cantidades_salida.*' => 'required|integer|min:1',
             ]);
 
+            $alerta_stock = [];
+
             foreach ($request->productos_salida as $index => $producto_id) {
-                $cantidad = $request->cantidades_salida[$index];
+                $cantidad_salida = $request->cantidades_salida[$index];
+                $cantidad_restante = $cantidad_salida;
 
-                // Crea un movimiento por cada producto/cantidad
-                Movimiento::create([
-                    'tipo_movimiento' => 'Salida',
-                    'producto_id' => $producto_id,
-                    'cantidad' => $cantidad,
-                    'fecha' => $request->fecha,
-                    'clasificacion_id' => $request->clasificacion_id,
-                    'evento' => $request->evento,
-                    'solicitante_id' => $request->solicitante_id,
-                    'responsable' => $request->responsable,
-                    'observaciones' => $request->observaciones,
-                ]);
+                // FIFO: busca lotes disponibles ordenados por fecha de vencimiento
+                $movimientos = Movimiento::where('producto_id', $producto_id)
+                    ->where('tipo_movimiento', 'Entrada')
+                    ->where('fecha_vencimiento', '>=', now())
+                    ->orderBy('fecha_vencimiento')
+                    ->get();
 
-                // Actualiza el stock del producto
+                foreach ($movimientos as $mov) {
+                    // Stock disponible en este lote
+                    $stock_lote = Movimiento::where('producto_id', $producto_id)
+                        ->where('lote', $mov->lote)
+                        ->where('fecha_vencimiento', $mov->fecha_vencimiento)
+                        ->selectRaw('SUM(CASE WHEN tipo_movimiento="Entrada" THEN cantidad ELSE -cantidad END) as stock_lote')
+                        ->value('stock_lote');
+
+                    if ($stock_lote <= 0) continue;
+
+                    $descontar = min($cantidad_restante, $stock_lote);
+
+                    // Registrar movimiento de salida para este lote
+                    Movimiento::create([
+                        'tipo_movimiento' => 'Salida',
+                        'producto_id' => $producto_id,
+                        'cantidad' => $descontar,
+                        'fecha' => $request->fecha,
+                        'clasificacion_id' => $request->clasificacion_id,
+                        'evento' => $request->evento,
+                        'lote' => $mov->lote,
+                        'fecha_vencimiento' => $mov->fecha_vencimiento,
+                        'solicitante_id' => $request->solicitante_id,
+                        'responsable' => $request->responsable,
+                        'motivo' => $request->motivo,
+                        'observaciones' => $request->observaciones,
+                    ]);
+
+                    $cantidad_restante -= $descontar;
+                    if ($cantidad_restante <= 0) break;
+                }
+
+                // Actualiza el stock general del producto
                 $producto = Producto::find($producto_id);
-                $producto->stock_actual -= $cantidad;
+                $producto->stock_actual -= $cantidad_salida;
                 $producto->save();
 
                 // Notificación si llega al mínimo
@@ -71,9 +103,10 @@ class MovimientoController extends Controller
                     $alerta_stock[] = "¡Atención! El producto '{$producto->nombre}' ha llegado al stock mínimo. Es necesario hacer un pedido.";
                 }
             }
+
             return redirect()->route('movimiento.create')->with([
                 'success' => 'Movimientos de salida registrados y stock actualizado.',
-                'alerta_stock' => isset($alerta_stock) ? implode(' | ', $alerta_stock) : null
+                'alerta_stock' => count($alerta_stock) ? implode(' | ', $alerta_stock) : null
             ]);
         }
 
@@ -111,6 +144,7 @@ class MovimientoController extends Controller
         if ($producto->stock_actual <= $producto->stock_minimo) {
             $alerta_stock = "¡Atención! El producto '{$producto->nombre}' ha llegado al stock mínimo. Es necesario hacer un pedido.";
         }
+
         return redirect()->route('movimiento.create')->with([
             'success' => 'Movimiento registrado y stock actualizado.',
             'alerta_stock' => $alerta_stock

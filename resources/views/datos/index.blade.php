@@ -55,8 +55,6 @@
         </div>
     </div>
 
-    
-
     <!-- Sección de paneles principales en filas separadas -->
     <div class="row g-4">
         <!-- Productos en Stock Crítico (fila completa) -->
@@ -100,7 +98,7 @@
                             </div>
                         </div>
                         @empty
-                        <div class="col-12">l
+                        <div class="col-12">
                             <div class="alert alert-success text-center">
                                 <i class="fas fa-check-circle fa-2x mb-2"></i>
                                 <h5>¡Excelente!</h5>
@@ -112,6 +110,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
 <!-- Fila 1: Últimos Certificados Usados y Productos más utilizados -->
 <div class="row mt-4 g-4">

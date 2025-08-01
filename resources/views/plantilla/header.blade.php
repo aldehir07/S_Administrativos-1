@@ -12,41 +12,15 @@
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <!-- <li class="dropdown pc-h-item d-inline-flex d-md-none">
-      <a
-        class="pc-head-link dropdown-toggle arrow-none m-0"
-        data-bs-toggle="dropdown"
-        href="#"
-        role="button"
-        aria-haspopup="false"
-        aria-expanded="false"
-      >
-        <i class="ti ti-search"></i>
-      </a> -->
-    <!-- <div class="dropdown-menu pc-h-dropdown drp-search">
-        <form class="px-3">
-          <div class="form-group mb-0 d-flex align-items-center">
-            <i data-feather="search"></i>
-            <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . .">
-          </div>
-        </form>
-      </div> -->
-    <!-- </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
-      <form class="header-search">
-        <i data-feather="search" class="icon-search"></i>
-        <input type="search" class="form-control" placeholder="Search here. . .">
-      </form>
-    </li> -->
-
+    
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
 <div class="ms-auto">
   <ul class="list-unstyled">
-
+    
       <!-- Conteo de notificaciones -->
-       <!-- <li class="dropdown pc-h-item">
+    <!-- <li class="dropdown pc-h-item">
       @php
       $notificaciones = ($vencidos->count() ?? 0) + ($proximos->count() ?? 0);
       @endphp
@@ -57,9 +31,9 @@
         role="button"
         aria-haspopup="false"
         aria-expanded="false">
-        <i class="ti ti-mail fs-4"></i>
+        <i class="ti ti-mail"></i>
         @if($notificaciones > 0)
-        <span class="notification-badge-custom">
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           {{ $notificaciones }}
         </span>
         @endif
@@ -67,6 +41,7 @@
       <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
         <div class="dropdown-header d-flex align-items-center justify-content-between">
           <h5 class="m-0">Notificaciones</h5>
+          <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-x text-danger"></i></a>
         </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
@@ -117,10 +92,10 @@
           <a href="{{ route('producto.index') }}" class="link-primary">Ver todos los productos</a>
         </div>
       </div>
-      </li> -->
-    </li>
+    </li> -->
+    
     <li class="dropdown pc-h-item header-user-profile">
-        <a
+      <a
         class="pc-head-link dropdown-toggle arrow-none me-0"
         data-bs-toggle="dropdown"
         href="#"
@@ -128,18 +103,22 @@
         aria-haspopup="false"
         data-bs-auto-close="outside"
         aria-expanded="false">
-        <img src="{{ asset('logo/Logo-ACG.png') }}" alt="Logo Academia" style="height:32px; width:auto; margin-right:8px; border-radius:50%; vertical-align:middle;">
-        <span>{{ Auth::user()->name ?? 'Usuario' }}</span>
+        @if(!Auth::user())
+        <img src="#!" alt="" class="">
+        <span>{{ Auth::user()->name ?? 'Usuario'}}</span>
       </a>
-    </li>
+      @else
+      <img src="{{ asset('logo/Logo-ACG.png') }}" alt="user-image" class="user-avtar wid-35">
+      <span>{{ Auth::user()->name ?? 'Usuario'}}</span>
+      @endif
 
       <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
         <div class="dropdown-header">
           <div class="d-flex mb-1">
             <div class="flex-shrink-0">
-              <img src="#!" alt="image" class="user-avtar wid-35">
+              <img src="{{ asset('logo/Logo-ACG.png') }}" alt="user-image" class="user-avtar wid-35">
             </div>
-            <div class="flex-grow-1 ms-3">
+            <div class="flex-grow-1 ms-5">
               <h6 class="mb-1">{{ Auth::user()->name ?? 'Usuario'}}</h6>
               <span>{{ Auth::user()->email ?? 'Usuario'}}</span>
             </div>

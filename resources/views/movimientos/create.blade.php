@@ -36,6 +36,7 @@
                         Entrada</option>
                     <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                     <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
+                    
                 </select>
             </div>
 
@@ -98,7 +99,7 @@
                     </div>
 
                     <!-- Cantidad -->
-                    <div class="mb-3 entrada-campos descarte-campos  d-none">
+                    <div class="mb-3 entrada-campos descarte-campos d-none">
                         <label class="form-label">Cantidad</label>
                         <input type="number" name="cantidad" class="form-control" min="1">
                     </div>
@@ -159,6 +160,7 @@
                         </select>
                     </div>
 
+
                     <!-- Motivo de Descarte -->
                     <div class="mb-3 descarte-campos d-none">
                         <label class="form-label">Motivo de Descarte</label>
@@ -205,12 +207,12 @@
                         <th class="col-entrada">Observaciones</th>
                         <th class="col-entrada col-salida col-descarte">Fecha</th>
                         <th class="col-salida">Solicitado por</th>
-                        <th class="col-entrada">Fecha de Vencimiento</th>
+                        <th >Fecha de Vencimiento</th>
                         <th class="col-entrada col-salida col-descarte">E/S/D</th>
                         <th class="col-salida">Responsable</th>
                         <th class="col-salida">Evento</th>
                         <th class="col-descarte">Motivo</th>
-                        <th class="col-entrada">Lote</th>
+                        <th >Lote</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -223,7 +225,7 @@
                         <td class="col-entrada">{{ $mov->observaciones }}</td>
                         <td class="col-entrada col-salida col-descarte">{{ $mov->fecha }}</td>
                         <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
-                        <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
+                        <td >{{ $mov->fecha_vencimiento }}</td>
                         <td>
                             @if ($mov->tipo_movimiento === 'Entrada')
                             <span class="badge bg-success">Entrada</span>
@@ -236,7 +238,7 @@
                         <td class="col-salida">{{ $mov->responsable }}</td>
                         <td class="col-salida">{{ $mov->evento }}</td>
                         <td class="col-descarte">{{ $mov->motivo }}</td>
-                        <td class="col-entrada">{{ $mov->lote }}</td>
+                        <td >{{ $mov->lote }}</td>
                         <td>
                             <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i>
@@ -376,6 +378,7 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
+            
         };
 
         // Función para aplicar filtros
@@ -428,13 +431,12 @@
 
         // Al cargar, aplicar filtro "Todos"
         aplicarFiltro('');
-
-        // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
-        @if(isset($producto_id))
-        //Forzar seleccion y mostrar campos de ENtrada
-        tipoRegistro.value = 'Entrada';
-        tipoRegistro.dispatchEvent(new Event('change'));
-        @endif
+            // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
+            @if(isset($producto_id))
+                //Forzar seleccion y mostrar campos de ENtrada
+                tipoRegistro.value = 'Entrada';
+                tipoRegistro.dispatchEvent(new Event('change'));
+            @endif
     });
 </script>
 @endsection

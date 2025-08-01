@@ -99,6 +99,15 @@ class DatoController extends Controller
             ->with('producto')
             ->take(10) // Top 10
             ->get();
+        
+        //Mostrar el stock por lote y fecha de vencimeinto
+        $inventario = Movimiento::select('producto_id', 'lote', 'fecha_vencimiento')
+            ->selectRaw('SUM(CASE WHEN tipo_movimiento="Entrada" THEN cantidad ELSE -cantidad END) as stock_lote')
+            ->whereNotNull('fecha_vencimiento')
+            ->groupBy('producto_id', 'lote', 'fecha_vencimiento')
+            ->having('stock_lote', '>', 0)
+            ->with('producto')
+            ->get();
 
         return view('datos.index', compact(
             'productosCriticos',
@@ -117,6 +126,7 @@ class DatoController extends Controller
             'certificadosAgregados',
             'ultimosCertificadosUsados',
             'productosMasUsados',
+            'inventario'
         ));
     }
 
