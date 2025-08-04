@@ -18,14 +18,14 @@
                     <label>Secciones</label>
                     <i class="ti ti-dashboard"></i>
                 </li>
-                
+
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link"><span class="pc-micon"><i class="bi bi-fork-knife"></i></span><span class="pc-mtext">Insumos</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                         <ul class="pc-submenu">
                             <li class="pc-item"><a class="pc-link" href="{{ route('producto.create') }}">Productos</a></li>
                             <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
                             <li class="pc-item"><a class="pc-link" href="{{ route('reportes.index') }}">Reportes</a></li>
-                            <li class="pc-item"><a class="pc-link" href="{{ route('certificados.create') }}">Certificados</a></li>
+                            {{-- <li class="pc-item"><a class="pc-link" href="{{ route('certificados.create') }}">Certificados</a></li> --}}
                         </ul>
                     </li>
                     <li class="pc-item pc-hasmenu">
@@ -52,9 +52,9 @@
                             <li class="pc-item"><a class="pc-link" href="#!">Reportes</a></li>
                         </ul> -->
                     </li>
-                
+
             </ul>
-            
+
             <li class="pc-item pc-caption">
                 <label>Usuario</label>
                 <i class="ti ti-news"></i>

@@ -2,13 +2,19 @@
 @section('content')
 
 <div class="container">
-    
+
 
     @if(session('alerta_stock'))
     <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">
         <i class="fas fa-exclamation-triangle"></i>
         {{ session('alerta_stock') }}
     </div>
+    @endif
+
+    @if(session('errores_stock'))
+        <div class="alert alert-danger">
+            {{ session('errores_stock') }}
+        </div>
     @endif
 
     @if(session('success'))
@@ -36,7 +42,7 @@
                         Entrada</option>
                     <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                     <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-                    
+                    <option value="Certificado" {{ old('tipo_movimiento') == 'Certificado' ? 'selected' : '' }}>Certificado</option>
                 </select>
             </div>
 
@@ -86,7 +92,7 @@
                     </div>
 
                     <!-- Producto para Entrada, Descarte -->
-                    <div class="mb-3 entrada-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Producto</label>
                         <select name="producto_id" id="productoSelectUnico" class="form-select">
                             <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
@@ -99,7 +105,7 @@
                     </div>
 
                     <!-- Cantidad -->
-                    <div class="mb-3 entrada-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Cantidad</label>
                         <input type="number" name="cantidad" class="form-control" min="1">
                     </div>
@@ -111,7 +117,7 @@
                     </div>
 
                     <!-- Observaciones -->
-                    <div class="mb-3 entrada-campos d-none">
+                    <div class="mb-3 entrada-campos certificado-campos d-none">
                         <label class="form-label">Observaciones</label>
                         <textarea name="observaciones" class="form-control" rows="2"></textarea>
                     </div>
@@ -121,13 +127,13 @@
                 <div class="col-md-6">
 
                     <!-- Fecha -->
-                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Fecha</label>
                         <input type="date" name="fecha" class="form-control" required>
                     </div>
 
                     <!-- Lote -->
-                    <div class="mb-3 entrada-campos d-none">
+                    <div class="mb-3 entrada-campos descarte-campos d-none">
                         <label class="form-label">Lote</label>
                         <input type="text" name="lote" class="form-control">
                     </div>
@@ -160,6 +166,12 @@
                         </select>
                     </div>
 
+                    <!-- Responsable para Certificado -->
+                    <div class="mb-3 certificado-campos d-none">
+                        <label class="form-label">Responsable</label>
+                        <input type="text" name="responsable" class="form-control" placeholder="Nombre del responsable">
+                    </div>
+
 
                     <!-- Motivo de Descarte -->
                     <div class="mb-3 descarte-campos d-none">
@@ -181,7 +193,7 @@
         </div>
     </div>
 
-    
+
 
     <div class="card mt-5">
 
@@ -257,7 +269,7 @@
             </table>
         </div>
     </div>
-        
+
     </div>
 </div>
 
@@ -378,7 +390,7 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
-            
+
         };
 
         // Función para aplicar filtros

@@ -18,7 +18,6 @@
                     <option value="Salida" {{ $movimiento->tipo_movimiento == 'Salida' ? 'selected' : '' }}>Salida</option>
                     <option value="Descarte" {{ $movimiento->tipo_movimiento == 'Descarte' ? 'selected' : '' }}>Descarte</option>
                 </select>
-                <input type="hidden" name="tipo_movimiento" value="{{ $movimiento->tipo_movimiento }}">
             </div>
 
             <div class="row">
@@ -119,7 +118,7 @@
         </div>
     </div>
 
-    
+
 
 <div class="card mt-5">
     <div class="card-header" style="background:#3177bf;">
@@ -196,7 +195,7 @@
     </div>
     </div>
     </div>
-    
+
 </div>
 </div>
 
@@ -266,7 +265,7 @@
                 b.classList.remove('btn-primary');
                 b.classList.add('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
             });
-            
+
             const botonActivo = document.querySelector(`[data-tipo="${tipo}"]`);
             if (botonActivo) {
                 botonActivo.classList.add('active', 'btn-primary');
@@ -275,14 +274,14 @@
 
             // Mostrar/ocultar columnas
             const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
-            
+
             // Ocultar todas las columnas específicas
             document.querySelectorAll('th, td').forEach(el => {
                 if (el.className.match(/col-(entrada|salida|descarte)/)) {
                     el.style.display = 'none';
                 }
             });
-            
+
             // Mostrar las columnas del tipo seleccionado
             mostrar.forEach(clase => {
                 document.querySelectorAll('.' + clase).forEach(el => el.style.display = '');
