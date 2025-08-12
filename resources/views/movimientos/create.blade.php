@@ -8,18 +8,21 @@
     <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">
         <i class="fas fa-exclamation-triangle"></i>
         {{ session('alerta_stock') }}
+        <button type="button" class="btn-close float-end me-3" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
     @if(session('errores_stock'))
         <div class="alert alert-danger">
             {{ session('errores_stock') }}
+            <button type="button" class="btn-close float-end me-3" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
+        <button type="button" class="btn-close float-end me-3" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
@@ -134,8 +137,12 @@
 
                     <!-- Lote -->
                     <div class="mb-3 entrada-campos descarte-campos d-none">
-                        <label class="form-label">Lote</label>
-                        <input type="text" name="lote" class="form-control">
+                        <label class="form-label">Lote <small class="text-muted">(Opcional - Para productos comestibles)</small></label>
+                        <input type="text" name="lote" class="form-control" placeholder="Dejar vacío si no aplica">
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> 
+                            Los lotes son obligatorios para productos comestibles. Para otros productos, puede dejarse vacío.
+                        </small>
                     </div>
 
                     <!-- Fecha de Vencimiento -->
@@ -207,6 +214,7 @@
             <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
             <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
             <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
+            <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -215,16 +223,16 @@
                     <tr class="table-info">
                         <th class="col-entrada col-salida col-descarte">Clasificación</th>
                         <th class="col-entrada col-salida col-descarte">Producto</th>
-                        <th class="col-entrada col-salida col-descarte">Cantidad</th>
-                        <th class="col-entrada">Observaciones</th>
-                        <th class="col-entrada col-salida col-descarte">Fecha</th>
+                        <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
+                        <th class="col-entrada col-certificado">Observaciones</th>
+                        <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
                         <th class="col-salida">Solicitado por</th>
-                        <th >Fecha de Vencimiento</th>
-                        <th class="col-entrada col-salida col-descarte">E/S/D</th>
-                        <th class="col-salida">Responsable</th>
+                        <th class="col-entrada" >Fecha de Vencimiento</th>
+                        <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
+                        <th class="col-salida col-certificado">Responsable</th>
                         <th class="col-salida">Evento</th>
                         <th class="col-descarte">Motivo</th>
-                        <th >Lote</th>
+                        <th class="col-salida col-entrada">Lote</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -233,24 +241,26 @@
                     <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
                         <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
                         <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
-                        <td class="col-entrada col-salida col-descarte">{{ $mov->cantidad }}</td>
-                        <td class="col-entrada">{{ $mov->observaciones }}</td>
-                        <td class="col-entrada col-salida col-descarte">{{ $mov->fecha }}</td>
+                        <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
+                        <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
+                        <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>
                         <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
-                        <td >{{ $mov->fecha_vencimiento }}</td>
-                        <td>
+                        <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
+                        <td class="col-entrada col-salida col-descarte col-certificado">
                             @if ($mov->tipo_movimiento === 'Entrada')
-                            <span class="badge bg-success">Entrada</span>
+                                <span class="badge bg-success">Entrada</span>
                             @elseif ($mov->tipo_movimiento === 'Descarte')
-                            <span class="badge bg-warning">Descarte</span>
+                                <span class="badge bg-warning">Descarte</span>
                             @elseif ($mov->tipo_movimiento === 'Salida')
-                            <span class="badge bg-danger">Salida</span>
+                                <span class="badge bg-danger">Salida</span>
+                            @elseif ($mov->tipo_movimiento === 'Certificado')
+                                <span class="badge bg-info text-dark">Certificado</span>
                             @endif
                         </td>
-                        <td class="col-salida">{{ $mov->responsable }}</td>
+                        <td class="col-salida col-certificado">{{ $mov->responsable }}</td>
                         <td class="col-salida">{{ $mov->evento }}</td>
                         <td class="col-descarte">{{ $mov->motivo }}</td>
-                        <td >{{ $mov->lote }}</td>
+                        <td class="col-salida col-entrada">{{ $mov->lote }}</td>
                         <td>
                             <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i>
@@ -390,6 +400,7 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
+            'Certificado': ['col-certificado']
 
         };
 
@@ -413,7 +424,7 @@
 
             // Ocultar todas las columnas específicas
             document.querySelectorAll('th, td').forEach(el => {
-                if (el.className.match(/col-(entrada|salida|descarte)/)) {
+                if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
                     el.style.display = 'none';
                 }
             });

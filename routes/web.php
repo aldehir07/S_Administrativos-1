@@ -35,5 +35,6 @@ route::get('/login', [UsuarioController::class, 'loginfrm'])->name('login');
 route::post('/login', [UsuarioController::class, 'login'])->name('loginpost');
 route::get('logout', [UsuarioController::class, 'logout'])->name('logout');
 route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
+route::get('reportes/exportar-pdf', [ReporteController::class, 'exportarPDF'])->name('reportes.exportar-pdf');
 
 Route::post('producto/importar', [ProductoController::class, 'importar'])->name('producto.importar');

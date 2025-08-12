@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container-fluid">
+
+
     <div class="card">
         <div class="card-header" style="background:#082140;">
             <h2 class="card-tittle mb-0 text-white"><i class="fas fa-chart-bar"></i> Reporte de Movimientos</h2>
@@ -35,6 +37,7 @@
                         <option value="Entrada" {{ request('tipo_movimiento') == 'Entrada' ? 'selected' : '' }}>Entrada</option>
                         <option value="Salida" {{ request('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                         <option value="Descarte" {{ request('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
+                        <option value="Certificado" {{ request('tipo_movimiento') == 'Certificado' ? 'selected' : '' }}>Certificado</option>
                     </select>
                 </div>
                 <div class="col-md-1 d-grid">
@@ -44,58 +47,66 @@
         </div>
     </div>
 
+    <!-- Botones para Exportar a Excel y PDF -->
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <!-- <a href="" class="btn btn-success btn-sm">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+        </a> -->
+        <a href="{{ route('reportes.exportar-pdf', request()->all()) }}" class="btn btn-danger btn-sm">
+            <i class="fas fa-file-pdf"></i> Exportar a PDF
+        </a>
+    </div>
     
-
     <!-- Tabla de resultados -->
-    <div class="card mt-5">
+    <div class="card mt-3">
         <div class="card-header" style="background:#3177bf">
             <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Movimientos encontrados</h4>
         </div>
         
-                <table class="table table-striped table-hover" id="tabla">
-                    <thead >
-                        <tr class="table-info">
-                            <th>Fecha</th>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Tipo</th>
-                            <th>Responsable</th>
-                            <th>Evento/Destino</th>
-                            <th>Observaciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($movimientos as $mov)
-                        <tr>
-                            <td>{{ $mov->fecha }}</td>
-                            <td>{{ $mov->producto->nombre ?? '-' }}</td>
-                            <td>{{ $mov->cantidad }}</td>
-                            <td>
-                                @if($mov->tipo_movimiento == 'Entrada')
-                                    <span class="badge bg-success">Entrada</span>
-                                @elseif($mov->tipo_movimiento == 'Salida')
-                                    <span class="badge bg-danger">Salida</span>
-                                @else
-                                    <span class="badge bg-warning text-dark">Descarte</span>
-                                @endif
-                            </td>
-                            <td>{{ $mov->responsable ?? '-' }}</td>
-                            <td>{{ $mov->evento ?? '-' }}</td>
-                            <td>{{ $mov->observaciones ?? '-' }}</td>
-                        </tr>
-                        @empty
+            <table class="table table-striped table-hover" id="tabla">
+                <thead >
+                    <tr class="table-info">
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Tipo</th>
+                        <th>Responsable</th>
+                        <th>Evento/Destino</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($movimientos as $mov)
+                    <tr>
+                        <td>{{ $mov->fecha }}</td>
+                        <td>{{ $mov->producto->nombre ?? '-' }}</td>
+                        <td>{{ $mov->cantidad }}</td>
+                        <td>
+                             @if($mov->tipo_movimiento == 'Entrada')
+                                <span class="badge bg-success">Entrada</span>
+                            @elseif($mov->tipo_movimiento == 'Salida')
+                                <span class="badge bg-danger">Salida</span>
+                            @elseif($mov->tipo_movimiento == 'Certificado')
+                                <span class="badge bg-info text-dark">Certificado</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Descarte</span>
+                            @endif
+                        </td>
+                        <td>{{ $mov->responsable ?? '-' }}</td>
+                        <td>{{ $mov->evento ?? '-' }}</td>
+                        <td>{{ $mov->observaciones ?? '-' }}</td>
+                    </tr>
+                    @empty
                         <tr>
                             <td colspan="7" class="text-center text-muted">No hay movimientos para los filtros seleccionados.</td>
                         </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            
-        
+                    @endforelse
+                </tbody>
+            </table>
     </div>
 
     <!-- Ranking de productos más utilizados -->
-    @if($productosMasUsados->count())
+    <!-- @if($productosMasUsados->count())
         <div class="card shadow-sm">
             <div class="card-header text-white" style="background:#3177bf">
                 <i class="fas fa-trophy"></i> Productos más utilizados {{ request('desde') || request('hasta') ? 'en el periodo seleccionado' : 'históricamente' }}
@@ -121,6 +132,6 @@
                 </div>
             </div>
         </div>
-    @endif
+    @endif -->
 </div>
 @endsection

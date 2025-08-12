@@ -3,7 +3,7 @@
     <div class="navbar-wrapper">
         <div class="m-header">
             <a href="{{ route('datos.index') }}" class="b-brand text-primary">
-                <img src="{{ asset('logo/SISA.jpg') }}" class="img-fluid logo-lg" alt="logo">
+                <img src="{{ asset('logo/SIDSA-2.png') }}" class="img-fluid logo-lg" alt="logo">
             </a>
         </div>
         <div class="navbar-content">

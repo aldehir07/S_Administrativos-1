@@ -24,12 +24,12 @@ class MovimientoController extends Controller
     public function create(Request $request)
     {
 
-        $movimientos = Movimiento::with(['producto', 'solicitante', 'clasificacion'])->latest()->get();
+        $movimientos = Movimiento::with(['producto', 'solicitante', 'clasificacion'])->latest()->get(); //Ontene todos los moviminetos mas recientes junto con sus relaciones: producto, solicitante y clasificacion
         // dd($movimientos);
-        $clasificaciones = Clasificacion::all();
-        $productos = Producto::with('clasificacion')->get();
-        $solicitantes = Solicitante::all();
-        $producto_id = $request->get('producto_id');
+        $clasificaciones = Clasificacion::all(); //Obtiene todos las clasificaciones disponibles
+        $productos = Producto::with('clasificacion')->get(); //Obtiene todos los productos junto con su clasificacion
+        $solicitantes = Solicitante::all(); //Obtiene todos los solicitantes
+        $producto_id = $request->get('producto_id');//Obtiene el ID del producto desde la solicitud, si se proporciona
         return view('movimientos.create', compact('clasificaciones', 'productos', 'solicitantes', 'movimientos', 'producto_id'));
     }
 
@@ -39,7 +39,9 @@ class MovimientoController extends Controller
 
     public function store(Request $request)
     {
+        // BLOQUE DE SALIDA
         if ($request->tipo_movimiento == "Salida") {
+            //Validacion de los datos necesarios para procesar salidas
             $request->validate([
                 'productos_salida' => 'required|array|min:1',
                 'cantidades_salida' => 'required|array|min:1',
@@ -71,53 +73,84 @@ class MovimientoController extends Controller
                     ->orderBy('fecha_vencimiento')
                     ->get();
 
-                // Si no hay lotes disponibles, notifica error y pasa al siguiente producto
-                if ($movimientos->isEmpty()) {
-                    $errores_stock[] = "El producto ID $producto_id->nombre no tiene lotes disponibles. Registre primero una entrada con lote.";
-                    continue;
-                }
-
                 $salida_realizada = false;
 
-                foreach ($movimientos as $mov) {
-                    // Stock disponible en este lote
-                    $stock_lote = Movimiento::where('producto_id', $producto_id)
-                        ->where('lote', $mov->lote)
-                        ->where('fecha_vencimiento', $mov->fecha_vencimiento)
-                        ->selectRaw("SUM(CASE WHEN tipo_movimiento='Entrada' THEN cantidad ELSE -cantidad END) as stock_lote")
-                        ->value('stock_lote');
+                // Si hay lotes disponibles, procesar por lotes
+                if ($movimientos->isNotEmpty()) {
+                    foreach ($movimientos as $mov) {
+                        // Stock disponible en este lote
+                        $stock_lote = Movimiento::where('producto_id', $producto_id)
+                            ->where('lote', $mov->lote)
+                            ->where('fecha_vencimiento', $mov->fecha_vencimiento)
+                            ->selectRaw("SUM(CASE WHEN tipo_movimiento='Entrada' THEN cantidad ELSE -cantidad END) as stock_lote")
+                            ->value('stock_lote');
 
-                    if ($stock_lote <= 0) continue;
+                        if ($stock_lote <= 0) continue;
 
-                    $descontar = min($cantidad_restante, $stock_lote);
+                        $descontar = min($cantidad_restante, $stock_lote);
 
-                    // Registrar movimiento de salida para este lote
-                    Movimiento::create([
-                        'tipo_movimiento' => 'Salida',
-                        'producto_id' => $producto_id,
-                        'cantidad' => $descontar,
-                        'fecha' => $request->fecha,
-                        'clasificacion_id' => $request->clasificacion_id,
-                        'evento' => $request->evento,
-                        'lote' => $mov->lote,
-                        'fecha_vencimiento' => $mov->fecha_vencimiento,
-                        'solicitante_id' => $request->solicitante_id,
-                        'responsable' => $request->responsable,
-                        'motivo' => $request->motivo,
-                        'observaciones' => $request->observaciones,
-                    ]);
+                        // Registrar movimiento de salida para este lote
+                        Movimiento::create([
+                            'tipo_movimiento' => 'Salida',
+                            'producto_id' => $producto_id,
+                            'cantidad' => $descontar,
+                            'fecha' => $request->fecha,
+                            'clasificacion_id' => $request->clasificacion_id,
+                            'evento' => $request->evento,
+                            'lote' => $mov->lote,
+                            'fecha_vencimiento' => $mov->fecha_vencimiento,
+                            'solicitante_id' => $request->solicitante_id,
+                            'responsable' => $request->responsable,
+                            'motivo' => $request->motivo,
+                            'observaciones' => $request->observaciones,
+                        ]);
 
-                    $cantidad_restante -= $descontar;
-                    $salida_realizada = true;
-                    if ($cantidad_restante <= 0) break;
+                        $cantidad_restante -= $descontar;
+                        $salida_realizada = true;
+                        if ($cantidad_restante <= 0) break;
+                    }
+                } else {
+                    // Si no hay lotes, procesar como salida sin lote (para productos existentes)
+                    // Buscar entradas sin lote o con stock disponible
+                    $stock_disponible = Movimiento::where('producto_id', $producto_id)
+                        ->where('tipo_movimiento', 'Entrada')
+                        ->whereNull('lote')
+                        ->sum('cantidad');
+
+                    $stock_salidas = Movimiento::where('producto_id', $producto_id)
+                        ->where('tipo_movimiento', 'Salida')
+                        ->whereNull('lote')
+                        ->sum('cantidad');
+
+                    $stock_real_disponible = $stock_disponible - $stock_salidas;
+
+                    if ($stock_real_disponible >= $cantidad_salida) {
+                        // Registrar salida sin lote
+                        Movimiento::create([
+                            'tipo_movimiento' => 'Salida',
+                            'producto_id' => $producto_id,
+                            'cantidad' => $cantidad_salida,
+                            'fecha' => $request->fecha,
+                            'clasificacion_id' => $request->clasificacion_id,
+                            'evento' => $request->evento,
+                            'solicitante_id' => $request->solicitante_id,
+                            'responsable' => $request->responsable,
+                            'motivo' => $request->motivo,
+                            'observaciones' => $request->observaciones,
+                        ]);
+
+                        $cantidad_restante = 0;
+                        $salida_realizada = true;
+                    } else {
+                        $errores_stock[] = "El producto '{$producto->nombre}' no tiene suficiente stock disponible para la salida solicitada.";
+                        continue;
+                    }
                 }
 
                 // Si queda cantidad sin cubrir, notifica error
                 if ($cantidad_restante > 0) {
-                    $errores_stock[] = "No hay suficiente stock para el producto ID $producto_id. Faltan $cantidad_restante unidades.";
+                    $errores_stock[] = "No hay suficiente stock para el producto '{$producto->nombre}'. Faltan $cantidad_restante unidades.";
                 }
-
-
 
                 // Solo actualiza el stock si se realizó al menos una salida
                 if ($salida_realizada) {
@@ -153,6 +186,7 @@ class MovimientoController extends Controller
                 ]);
             }
 
+            //Registra el movimiento de descarte
             Movimiento::create([
                 'tipo_movimiento' => 'Descarte',
                 'producto_id' => $request->producto_id,
@@ -180,7 +214,17 @@ class MovimientoController extends Controller
         }
         // ---- FIN BLOQUE DESCARTE ----
 
+        
+        // ---- AQUI VA EL BLOQUE DE CERTIFICADO ----
+        // Validar que el tipo de movimiento sea 'Certificado'
         if ($request->tipo_movimiento == 'Certificado') {
+            $request->validate([
+                'producto_id' => 'required|exists:productos,id',
+                'clasificacion_id' => 'required|exists:clasificaciones,id',
+                'cantidad' => 'required|integer|min:1',
+                'fecha' => 'required|date',
+                'responsable' => 'required|string',
+            ]);
             $producto = Producto::find($request->producto_id);
 
             // Validar stock suficiente
@@ -190,9 +234,11 @@ class MovimientoController extends Controller
                 ]);
             }
 
+            //Registra el certificado
             Movimiento::create([
                 'tipo_movimiento' => 'Certificado',
                 'producto_id' => $request->producto_id,
+                'clasificacion_id' => $request->clasificacion_id,
                 'cantidad' => $request->cantidad,
                 'fecha' => $request->fecha,
                 'responsable' => $request->responsable,
@@ -220,6 +266,20 @@ class MovimientoController extends Controller
             'cantidad' => 'required|integer|min:1',
         ]);
 
+        // Validación condicional para lotes en productos comestibles
+        if ($request->tipo_movimiento == 'Entrada') {
+            $producto = Producto::with('clasificacion')->find($request->producto_id);
+            
+            // Si es un producto comestible, el lote es obligatorio
+            if ($producto->clasificacion && in_array(strtolower($producto->clasificacion->nombre), ['comestibles', 'alimentos', 'bebidas', 'perecederos'])) {
+                $request->validate([
+                    'lote' => 'required|string',
+                    'fecha_vencimiento' => 'required|date|after:today',
+                ]);
+            }
+        }
+
+        //Crea el movimiento
         Movimiento::create([
             'tipo_movimiento' => $request->tipo_movimiento,
             'producto_id' => $request->producto_id,
@@ -235,7 +295,7 @@ class MovimientoController extends Controller
             'observaciones' => $request->observaciones
         ]);
 
-        // Actualiza el stock
+        // Actualiza el stock segun el tipo de movimineto
         $producto = Producto::find($request->producto_id);
         if ($request->tipo_movimiento == 'Entrada') {
             $producto->stock_actual += $request->cantidad;
@@ -268,10 +328,11 @@ class MovimientoController extends Controller
      */
     public function edit(Movimiento $movimiento)
     {
+        //Obtiene todos los movimientos con sus relaciones de producto y solicitante
         $movimientos = Movimiento::with(['producto', 'solicitante'])->latest()->get();
-        $clasificaciones = Clasificacion::all();
-        $productos = Producto::all();
-        $solicitantes = Solicitante::all();
+        $clasificaciones = Clasificacion::all();//Obtiene toldoas las clasificaciones disponibles
+        $productos = Producto::all();//Obtiene todos los productos disponibles
+        $solicitantes = Solicitante::all();//Obtiene todos los solicitantes disponibles
         return view('movimientos.edit', compact('movimiento', 'movimientos', 'clasificaciones', 'productos', 'solicitantes'));
     }
 

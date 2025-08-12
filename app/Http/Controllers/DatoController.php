@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificado;
+use App\Models\Clasificacion;
 use App\Models\Dato;
 use App\Models\Producto;
 use App\Models\Movimiento;
@@ -61,6 +62,10 @@ class DatoController extends Controller
             ->take(5)
             ->get();
 
+        // Calcular certificados descuentados (movimientos de tipo "Certificado")
+        $certificadosDescuentados = Movimiento::where('tipo_movimiento', 'Certificado')
+            ->sum('cantidad');
+
         // Productos que necesitan reabastecimiento (stock actual <= stock mínimo)
         $productosNecesitanReabastecimiento = $productosCriticos->count();
 
@@ -109,6 +114,12 @@ class DatoController extends Controller
             ->with('producto')
             ->get();
 
+        //Busca la clasificacion de "Certificados"
+        $clasificacionCertificados = Clasificacion::where('nombre', 'certificados')->first();
+
+        //Suma el stock de todos los porductos con esa clasificacion
+        $stockCertificados = Producto::where('clasificacion_id', $clasificacionCertificados->id)->sum('stock_actual');
+
         return view('datos.index', compact(
             'productosCriticos',
             'productosVencidos',
@@ -126,7 +137,9 @@ class DatoController extends Controller
             'certificadosAgregados',
             'ultimosCertificadosUsados',
             'productosMasUsados',
-            'inventario'
+            'inventario',
+            'stockCertificados',
+            'certificadosDescuentados'
         ));
     }
 

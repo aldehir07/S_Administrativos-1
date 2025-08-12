@@ -6,6 +6,7 @@ use App\Models\Reporte;
 use App\Models\Movimiento;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReporteController extends Controller
 {
@@ -53,6 +54,49 @@ class ReporteController extends Controller
 
         return view('reportes.index', compact('movimientos', 'productos', 'productosMasUsados'));
     }
+
+    //Funcion para export a PDF 
+    public function exportarPDF(Request $request){
+
+        $query = Movimiento::query()->with('producto');
+
+        if($request->filled('desde')){
+            $query->where('fecha', '>=', $request->desde);
+        }
+        if($request->filled('hasta')){
+            $query->where('fecha', '<=', $request->hasta);
+        }
+        if($request->filled('producto_id')){
+            $query->where('producto_id', $request->producto_id);
+        }
+        if($request->filled('tipo_movimiento')){
+            $query->where('tipo_movimiento', $request->tipo_movimiento);
+        }
+
+        $movimientos = $query->orderBy('fecha', 'desc')->get();
+
+        //Calcular totales
+        $totalEntradas = $movimientos->where('tipo_movimiento', 'Entrada')->sum('cantidad');
+        $totalSalidas = $movimientos->where('tipo_movimiento', 'Salida')->sum('cantidad');
+        $totalDescartes = $movimientos->where('tipo_movimiento', 'Descarte')->sum('cantidad');
+        $totalCertificados = $movimientos->where('tipo_movimiento', 'Certificados')->sum('cantidad');
+
+        $data = [
+            'movimientos' => $movimientos,
+            'desde' => $request->input('desde'),
+            'hasta' => $request->input('hasta'),
+            'totalEntradas' => $totalEntradas,
+            'totalSalidas' => $totalSalidas,
+            'totalDescartes' => $totalDescartes,
+            'totalCertificados' => $totalCertificados,
+            'fechaReporte' => now()->format('d/m/Y H:i:s')
+        ];
+    
+    $pdf = Pdf::loadView('reportes.pdf', $data);
+
+    return $pdf->download('reporte-movimientos-' . now()->format('Y-m-d') . '.pdf');
+    }
+
 
     /**
      * Show the form for creating a new resource.

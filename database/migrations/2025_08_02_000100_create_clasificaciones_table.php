@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('clasificaciones', function (Blueprint $table) {
             $table->id();
-            $table->enum('nombre', ['comestibles', 'desechables', 'utiles de oficina', 'insumos de limpieza'])->unique();
+            $table->enum('nombre', ['comestibles', 'desechables', 'utiles de oficina', 'insumos de limpieza', 'certificados'])->unique();
             $table->timestamps();
         });
 
@@ -23,6 +23,7 @@ return new class extends Migration
                 ['nombre' => 'desechables'],
                 ['nombre' => 'utiles de oficina'],
                 ['nombre' => 'insumos de limpieza'],
+                ['nombre' => 'certificados']
             ]);
     }
 

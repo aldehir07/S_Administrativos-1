@@ -11,12 +11,16 @@
         @csrf
         @method('PUT')
 
-            <div class="mb-3">
-                <label class="form-label">Tipo de Movimiento</label>
-                <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required disabled>
-                    <option value="Entrada" {{ $movimiento->tipo_movimiento == 'Entrada' ? 'selected' : '' }}>Entrada</option>
-                    <option value="Salida" {{ $movimiento->tipo_movimiento == 'Salida' ? 'selected' : '' }}>Salida</option>
-                    <option value="Descarte" {{ $movimiento->tipo_movimiento == 'Descarte' ? 'selected' : '' }}>Descarte</option>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Tipo de Registro</label>
+                <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
+                    <option value="" {{ (!old('tipo_movimiento') && !$movimiento->tipo_movimiento) ? 'selected' : '' }}>Seleccione</option>
+                    <option value="Entrada"
+                        {{ (old('tipo_movimiento') == 'Entrada' || $movimiento->tipo_movimiento == 'Entrada') ? 'selected' : ''}}>
+                        Entrada</option>
+                    <option value="Salida" {{ (old('tipo_movimiento') == 'Salida' || $movimiento->tipo_movimiento == 'Salida') ? 'selected' : '' }}>Salida</option>
+                    <option value="Descarte" {{ (old('tipo_movimiento') == 'Descarte' || $movimiento->tipo_movimiento == 'Descarte') ? 'selected' : '' }}>Descarte</option>
+                    <option value="Certificado" {{ (old('tipo_movimiento') == 'Certificado' || $movimiento->tipo_movimiento == 'Certificado') ? 'selected' : '' }}>Certificado</option>
                 </select>
             </div>
 
@@ -24,11 +28,13 @@
                 <div class="col-md-6">
 
                     <!-- Clasificación -->
-                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Clasificación</label>
-                        <select name="clasificacion_id" class="form-select" id="clasificacionSelect" required>
-                            @foreach($clasificaciones as $clasificacion)
-                            <option value="{{ $clasificacion->id }}" {{ $movimiento->clasificacion_id == $clasificacion->id ? 'selected' : '' }}>
+                        <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
+                            <option value="" disabled>Seleccione</option>
+                            @foreach ($clasificaciones as $clasificacion)
+                            <option value="{{ $clasificacion->id }}"
+                                {{ $movimiento->clasificacion_id == $clasificacion->id ? 'selected' : '' }}>
                                 {{ $clasificacion->nombre }}
                             </option>
                             @endforeach
@@ -36,7 +42,7 @@
                     </div>
 
                     <!-- Producto -->
-                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Producto</label>
                         <select name="producto_id" class="form-select" id="productoSelect" required>
                             @foreach($productos as $producto)
@@ -48,7 +54,7 @@
                     </div>
 
                     <!-- Cantidad -->
-                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Cantidad</label>
                         <input type="number" name="cantidad" class="form-control" min="1" value="{{ $movimiento->cantidad }}">
                     </div>
@@ -60,7 +66,7 @@
                     </div>
 
                     <!-- Observaciones -->
-                    <div class="mb-3 entrada-campos d-none">
+                    <div class="mb-3 entrada-campos certificado-campos d-none">
                         <label class="form-label">Observaciones</label>
                         <textarea name="observaciones" class="form-control" rows="2">{{ $movimiento->observaciones }}</textarea>
                     </div>
@@ -70,7 +76,7 @@
                 <div class="col-md-6">
 
                     <!-- Fecha -->
-                    <div class="mb-3 entrada-campos salida-campos d-none">
+                    <div class="mb-3 entrada-campos salida-campos certificado-campos d-none">
                         <label class="form-label">Fecha</label>
                         <input type="date" name="fecha" class="form-control" value="{{ $movimiento->fecha }}" required>
                     </div>
@@ -98,15 +104,34 @@
                         </select>
                     </div>
 
+                    <!-- Responsable -->
                     <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Responsable</label>
-                        <input type="text" name="responsable" class="form-control" value="{{ $movimiento->responsable }}">
+                        <select name="responsable" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            <option value="Arline Tuñon" {{ old('responsable', $movimiento) == 'Arline Tuñon' ? 'selected' : '' }} >Arline Tuñon</option>
+                            <option value="Luis Urriola" {{ old('responsable', $movimiento) == 'Luis Urriola' ? 'selected' : '' }}>Luis Urriola</option>
+                            <option value="Otro" {{ old('responsable', $movimiento) == 'Otros' ? 'selected' : '' }}>Otro</option>
+                        </select>
                     </div>
 
-                    <div class="mb-3 descarte-campos d-none">
-                        <label class="form-label">Motivo</label>
-                        <input type="text" name="motivo" class="form-control" value="{{ $movimiento->motivo }}">
+                    <!-- Responsable para Certificado -->
+                    <div class="mb-3 certificado-campos d-none">
+                        <label class="form-label">Responsable</label>
+                        <input type="text" name="responsable" class="form-control" placeholder="Nombre del responsable" value="{{ $movimiento->responsable }}">
                     </div>
+
+                    <!-- Motivo de Descarte -->
+                    <div class="mb-3 descarte-campos d-none">
+                        <label class="form-label">Motivo de Descarte</label>
+                        <select name="motivo" class="form-select">
+                            <option value="" disabled selected>Seleccione</option>
+                            <option value="Dañado">Dañado</option>
+                            <option value="Vencido">Vencido</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
                 </div>
                 </div>
             </div>
@@ -132,6 +157,7 @@
             <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
             <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
             <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
+            <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -140,12 +166,12 @@
                 <tr class="table-dark">
                     <th class="col-entrada col-salida col-descarte">Clasificación</th>
                     <th class="col-entrada col-salida col-descarte">Producto</th>
-                    <th class="col-entrada col-salida col-descarte">Cantidad</th>
-                    <th class="col-entrada">Observaciones</th>
-                    <th class="col-entrada col-salida col-descarte">Fecha</th>
+                    <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
+                    <th class="col-entrada col-certificado">Observaciones</th>
+                    <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
                     <th class="col-salida">Solicitado por</th>
                     <th class="col-entrada">Fecha de Vencimiento</th>
-                    <th class="col-entrada col-salida col-descarte">E/S/D</th>
+                    <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
                     <th class="col-salida">Responsable</th>
                     <th class="col-salida">Evento</th>
                     <th class="col-descarte">Motivo</th>
@@ -158,18 +184,20 @@
                 <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
                     <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
                     <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
-                    <td class="col-entrada col-salida col-descarte">{{ $mov->cantidad }}</td>
-                    <td class="col-entrada">{{ $mov->observaciones }}</td>
-                    <td class="col-entrada col-salida col-descarte">{{ $mov->fecha }}</td>
+                    <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
+                    <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
+                    <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>
                     <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
                     <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
-                    <td class="col-entrada col-salida col-descarte">
+                    <td class="col-entrada col-salida col-descarte col-certificado">
                         @if ($mov->tipo_movimiento === 'Entrada')
-                        <span class="badge bg-success">Entrada</span>
+                            <span class="badge bg-success">Entrada</span>
                         @elseif ($mov->tipo_movimiento === 'Descarte')
-                        <span class="badge bg-warning">Descarte</span>
+                            <span class="badge bg-warning">Descarte</span>
                         @elseif ($mov->tipo_movimiento === 'Salida')
-                        <span class="badge bg-danger">Salida</span>
+                            <span class="badge bg-danger">Salida</span>
+                        @elseif ($mov->tipo_movimiento === 'Certificado')
+                                <span class="badge bg-info text-dark">Certificado</span>
                         @endif
                     </td>
                     <td class="col-salida">{{ $mov->responsable }}</td>
@@ -211,8 +239,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const tipoRegistro = document.getElementById('tipoRegistro');
+        if (tipoRegistro) {
+            tipoRegistro.dispatchEvent(new Event('change'));
+        }
         if (tipoRegistro && tipoRegistro.value) {
-            const tipos = ['entrada', 'salida', 'descarte'];
+            const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -221,7 +252,7 @@
         }
 
         tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte'];
+            const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -255,6 +286,7 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
+            'Certificado': ['col-certificado']
         };
 
         // Función para aplicar filtros
@@ -277,7 +309,7 @@
 
             // Ocultar todas las columnas específicas
             document.querySelectorAll('th, td').forEach(el => {
-                if (el.className.match(/col-(entrada|salida|descarte)/)) {
+                if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
                     el.style.display = 'none';
                 }
             });

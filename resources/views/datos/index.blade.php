@@ -2,7 +2,11 @@
 @section('content')
 
 <div class="container-fluid">
-    <h2 class="mb-4">Dashboard de Inventario</h2>
+    <div class="card">
+        <div class="card-header" style="background:#082140">
+        <h2 class="card-tittle mb-0 text-white">Dashboard de Inventario</h2>
+        </div>
+    </div>
     @if(session('mensaje2'))
     <div class="alert alert-danger">
         {{ session('mensaje2') }}
@@ -18,7 +22,7 @@
     <!-- Tarjetas de Estadísticas -->
     <div class="row mb-4 g-4">
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white bg-primary h-100 shadow-sm card-hover">
+            <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-boxes fa-3x mb-2"></i>
                     <h4 class="card-title mb-0">{{ $totalProductos }}</h4>
@@ -36,7 +40,7 @@
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white bg-success h-100 shadow-sm card-hover">
+            <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-certificate fa-3x mb-2"></i>
                     <h4 class="card-title mb-0">{{ $stockCertificados ?? 0 }}</h4>
@@ -45,11 +49,11 @@
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white bg-info h-100 shadow-sm card-hover">
+            <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-handshake fa-3x mb-2"></i>
-                    <h4 class="card-title mb-0">{{ $certificadosUsados ?? 0 }}</h4>
-                    <p class="card-text">Certificados Usados</p>
+                    <h4 class="card-title mb-0">{{ $certificadosDescuentados ?? 0 }}</h4>
+                    <p class="card-text">Total de Certificados Usados</p>
                 </div>
             </div>
         </div>
@@ -113,116 +117,106 @@
     </div>
 
 <!-- Fila 1: Últimos Certificados Usados y Productos más utilizados -->
-<div class="row mt-4 g-4">
-    <div class="col-12 col-lg-6">
-        <!-- Productos Vencidos y Próximos a Vencer -->
-        <div class="card h-100 shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Productos Vencidos y Próximos a Vencer</h5>
+    <div class="row mt-4 g-4">
+        <div class="col-12 col-lg-6">
+            <!-- Productos Vencidos y Próximos a Vencer -->
+            <div class="card h-100 shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-times-circle"></i> Productos Vencidos ({{ $productosVencidos->count() }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                    <th>Lote</th>
+                                    <th>Fecha de Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($productosVencidos as $producto)
+                                    @php
+                                        $movimientoVencido = \App\Models\Movimiento::where('producto_id', $producto->id)
+                                            ->whereNotNull('fecha_vencimiento')
+                                            ->where('fecha_vencimiento', '<', \Carbon\Carbon::now())
+                                            ->where('tipo_movimiento', 'Entrada')
+                                            ->latest('fecha_vencimiento')
+                                            ->first();
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $producto->nombre }}</td>
+                                        <td>{{ $producto->stock_actual }}</td>
+                                        <td>{{ $producto->lote ?? '-' }}</td>
+                                        <td>
+                                            {{ $movimientoVencido ? \Carbon\Carbon::parse($movimientoVencido->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @if($productosVencidos->isEmpty())
+                                    <tr>
+                                        <td colspan="4" class="text-center text-success">No hay productos vencidos.</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- Productos Vencidos -->
-                @if($productosVencidos->count() > 0)
-                <div class="mb-3">
-                    <h6 class="text-danger fw-bold mb-2">
-                        <i class="fas fa-times-circle"></i> Productos Vencidos ({{ $productosVencidos->count() }})
-                    </h6>
-                    @foreach($productosVencidos->take(3) as $producto)
-                    @php
-                        $movimientoVencido = \App\Models\Movimiento::where('producto_id', $producto->id)
-                            ->whereNotNull('fecha_vencimiento')
-                            ->where('fecha_vencimiento', '<', \Carbon\Carbon::now())
-                            ->where('tipo_movimiento', 'Entrada')
-                            ->latest('fecha_vencimiento')
-                            ->first();
-                    @endphp
-                    <div class="d-flex align-items-center mb-2 p-2 border border-danger rounded bg-danger bg-opacity-10">
-                        <div class="me-3">
-                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <i class="fas fa-times"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1 fw-bold text-danger">{{ $producto->nombre }}</h6>
-                            <p class="mb-1 text-muted">
-                                <i class="fas fa-box"></i> Stock: {{ $producto->stock_actual }}
-                            </p>
-                            <p>Lote: {{ $producto->lote }}</p>
-                            <small class="text-danger fw-bold">
-                                <i class="fas fa-calendar-times"></i> Vencido: {{ $movimientoVencido ? \Carbon\Carbon::parse($movimientoVencido->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
-                            </small>
-                        </div>
-                    </div>
-                    @endforeach
-                    @if($productosVencidos->count() > 3)
-                    <div class="text-center">
-                        <small class="text-muted">Y {{ $productosVencidos->count() - 3 }} productos más vencidos</small>
-                    </div>
-                    @endif
-                </div>
-                @endif
+        </div>
 
-                <!-- Productos Próximos a Vencer -->
-                @if($productosProximosVencer->count() > 0)
-                <div class="mb-3">
-                    <h6 class="text-warning fw-bold mb-2">
-                        <i class="fas fa-clock"></i> Próximos a Vencer ({{ $productosProximosVencer->count() }})
-                    </h6>
-                    @foreach($productosProximosVencer->take(3) as $producto)
-                    @php
-                        $movimientoProximo = \App\Models\Movimiento::where('producto_id', $producto->id)
-                            ->whereNotNull('fecha_vencimiento')
-                            ->where('fecha_vencimiento', '>=', \Carbon\Carbon::now())
-                            ->where('fecha_vencimiento', '<=', \Carbon\Carbon::now()->addDays(30))
-                            ->where('tipo_movimiento', 'Entrada')
-                            ->orderBy('fecha_vencimiento')
-                            ->first();
-                    @endphp
-                    <div class="d-flex align-items-center mb-2 p-2 border border-warning rounded bg-warning bg-opacity-10">
-                        <div class="me-3">
-                            <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1 fw-bold text-warning">{{ $producto->nombre }}</h6>
-                            <p class="mb-1 text-muted">
-                                <i class="fas fa-box"></i> Stock: {{ $producto->stock_actual }}
-                            </p>
-                            <small class="text-warning fw-bold">
-                                <i class="fas fa-calendar"></i> Vence: {{ $movimientoProximo ? \Carbon\Carbon::parse($movimientoProximo->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
-                            </small>
-                        </div>
+        <div class="col-12 col-lg-6">
+            <!-- Productos Próximos a Vencer -->
+            <div class="card h-100 shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Productos Próximos a Vencer ({{ $productosProximosVencer->count() }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                    <th>Fecha de Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($productosProximosVencer as $producto)
+                                    @php
+                                        $movimientoProximo = \App\Models\Movimiento::where('producto_id', $producto->id)
+                                            ->whereNotNull('fecha_vencimiento')
+                                            ->where('fecha_vencimiento', '>=', \Carbon\Carbon::now())
+                                            ->where('fecha_vencimiento', '<=', \Carbon\Carbon::now()->addDays(30))
+                                            ->where('tipo_movimiento', 'Entrada')
+                                            ->orderBy('fecha_vencimiento')
+                                            ->first();
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $producto->nombre }}</td>
+                                        <td>{{ $producto->stock_actual }}</td>
+                                        <td>
+                                            {{ $movimientoProximo ? \Carbon\Carbon::parse($movimientoProximo->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @if($productosProximosVencer->isEmpty())
+                                    <tr>
+                                        <td colspan="3" class="text-center text-success">No hay productos próximos a vencer.</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
-                    @endforeach
-                    @if($productosProximosVencer->count() > 3)
-                    <div class="text-center">
-                        <small class="text-muted">Y {{ $productosProximosVencer->count() - 3 }} productos más próximos a vencer</small>
-                    </div>
-                    @endif
                 </div>
-                @endif
-
-                @if($productosVencidos->isEmpty() && $productosProximosVencer->isEmpty())
-                <div class="text-center py-4">
-                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <h6 class="text-success">¡Excelente!</h6>
-                    <p class="text-muted mb-0">No hay productos vencidos ni próximos a vencer</p>
-                </div>
-                @endif
-
-                @if($productosVencidos->count() > 0 || $productosProximosVencer->count() > 0)
-                <div class="text-center mt-3">
-                    <a href="{{ route('producto.create') }}" class="btn btn-outline-warning btn-sm">
-                        <i class="fas fa-eye"></i> Ver Todos los Productos
-                    </a>
-                </div>
-                @endif
             </div>
         </div>
     </div>
+
+    <!--
+    Productos mas utilizados
     <div class="col-12 col-lg-6">
-        <!-- Productos más utilizados -->
         @if($productosMasUsados->count())
         <div class="card shadow-sm h-100">
             <div class="card-header bg-info text-white">
@@ -250,8 +244,7 @@
             </div>
         </div>
         @endif
-    </div>
-</div>
+    </div> -->
 
 <!-- Fila 2: Estado de Certificados y Últimos Movimientos -->
 <div class="row mt-4 g-4">
@@ -268,7 +261,7 @@
                         <div class="fs-5 text-dark">Disponibles</div>
                     </div>
                     <div class="col-6">
-                        <div class="display-4 fw-bold text-warning mb-1" style="font-size:2.8rem;">{{ $certificadosUsados ?? 0 }}</div>
+                        <div class="display-4 fw-bold text-warning mb-1" style="font-size:2.8rem;">{{ $certificadosDescuentados ?? 0 }}</div>
                         <div class="fs-5 text-dark">Usados</div>
                     </div>
                 </div>
