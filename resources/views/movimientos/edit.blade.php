@@ -81,17 +81,19 @@
                         <input type="date" name="fecha" class="form-control" value="{{ $movimiento->fecha }}" required>
                     </div>
 
-                    <div class="mb-3 entrada-campos d-none">
+                    <!-- Campo de Lote -->
+                    <div class="mb-3 entrada-campos certificado-campo d-none">
                         <label class="form-label">Lote</label>
                         <input type="text" name="lote" class="form-control" value="{{ $movimiento->lote }}">
                     </div>
 
-
-                    <div class="mb-3 entrada-campos d-none">
+                    <!-- Fecha de vencimiento -->
+                    <div class="mb-3 entrada-campos certificado-campo d-none">
                         <label class="form-label">Fecha de Vencimiento</label>
                         <input type="date" name="fecha_vencimiento" class="form-control" value="{{ $movimiento->fecha_vencimiento }}">
                     </div>
 
+                    <!-- Campo solocitado por -->
                     <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Solicitado por</label>
                         <select name="solicitante_id" class="form-select">
@@ -142,7 +144,6 @@
         </form>
         </div>
     </div>
-
 
 
 <div class="card mt-5">

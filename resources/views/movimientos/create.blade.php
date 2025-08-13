@@ -162,10 +162,10 @@
                         </select>
                     </div>
 
-                    <!-- Responsable -->
+                    <!-- Responsable para Salida -->
                     <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Responsable</label>
-                        <select name="responsable" class="form-select">
+                        <select name="responsable_salida" class="form-select">
                             <option value="" disabled selected>Seleccione</option>
                             <option value="Arline Tuñon">Arline Tuñon</option>
                             <option value="Luis Urriola">Luis Urriola</option>
@@ -176,7 +176,7 @@
                     <!-- Responsable para Certificado -->
                     <div class="mb-3 certificado-campos d-none">
                         <label class="form-label">Responsable</label>
-                        <input type="text" name="responsable" class="form-control" placeholder="Nombre del responsable">
+                        <input type="text" name="responsable_certificado" class="form-control" placeholder="Nombre del responsable">
                     </div>
 
 
@@ -199,7 +199,6 @@
         </form>
         </div>
     </div>
-
 
 
     <div class="card mt-5">
@@ -237,6 +236,18 @@
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
+                    <!-- Fila de debug temporal -->
+                    <!-- @if($movimientos->count() > 0)
+                    <tr class="table-warning">
+                        <td colspan="13" class="text-center">
+                            <strong>DEBUG:</strong> 
+                            Primer movimiento - Tipo: {{ $movimientos->first()->tipo_movimiento }}, 
+                            Responsable: "{{ $movimientos->first()->responsable ?? 'NULL' }}", 
+                            Evento: "{{ $movimientos->first()->evento ?? 'NULL' }}"
+                        </td>
+                    </tr>
+                    @endif -->
+                    
                     @foreach ($movimientos as $mov)
                     <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
                         <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
@@ -351,14 +362,35 @@
         });
 
         tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte'];
+            const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
+            
+            // Ocultar todos los campos y remover required
             tipos.forEach(tipo => {
-                document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
+                document.querySelectorAll(`.${tipo}-campos`).forEach(el => {
+                    el.classList.add('d-none');
+                    // Remover required de todos los campos
+                    el.querySelectorAll('input, select, textarea').forEach(campo => {
+                        campo.removeAttribute('required');
+                    });
+                });
             });
 
             if (this.value) {
                 const seleccionado = this.value.toLowerCase();
-                document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => el.classList.remove('d-none'));
+                document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => {
+                    el.classList.remove('d-none');
+                    // Agregar required a los campos del tipo seleccionado
+                    if (seleccionado === 'salida') {
+                        const responsableSalida = el.querySelector('select[name="responsable_salida"]');
+                        const evento = document.querySelector('input[name="evento"]');
+                        if (responsableSalida) responsableSalida.setAttribute('required', 'required');
+                        if (evento) evento.setAttribute('required', 'required');
+                    }
+                    if (seleccionado === 'certificado') {
+                        const responsableCertificado = el.querySelector('input[name="responsable_certificado"]');
+                        if (responsableCertificado) responsableCertificado.setAttribute('required', 'required');
+                    }
+                });
             }
         });
 
@@ -420,9 +452,9 @@
             }
 
             // Mostrar/ocultar columnas
-            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
+            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte', 'col-certificado'];
 
-            // Ocultar todas las columnas específicas
+            // Ocultar todas las columnas específicas primero
             document.querySelectorAll('th, td').forEach(el => {
                 if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
                     el.style.display = 'none';
@@ -430,9 +462,13 @@
             });
 
             // Mostrar las columnas del tipo seleccionado
-            mostrar.forEach(clase => {
-                document.querySelectorAll('.' + clase).forEach(el => el.style.display = '');
-            });
+            if (mostrar && mostrar.length > 0) {
+                mostrar.forEach(clase => {
+                    document.querySelectorAll('.' + clase).forEach(el => {
+                        el.style.display = '';
+                    });
+                });
+            }
 
             // Filtrar filas
             document.querySelectorAll('.fila-movimiento').forEach(function(row) {
@@ -454,12 +490,18 @@
 
         // Al cargar, aplicar filtro "Todos"
         aplicarFiltro('');
-            // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
-            @if(isset($producto_id))
-                //Forzar seleccion y mostrar campos de ENtrada
-                tipoRegistro.value = 'Entrada';
-                tipoRegistro.dispatchEvent(new Event('change'));
-            @endif
+        
+        // Ejecutar la lógica de required al cargar la página
+        if (tipoRegistro.value) {
+            tipoRegistro.dispatchEvent(new Event('change'));
+        }
+        
+        // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
+        @if(isset($producto_id))
+            //Forzar seleccion y mostrar campos de ENtrada
+            tipoRegistro.value = 'Entrada';
+            tipoRegistro.dispatchEvent(new Event('change'));
+        @endif
     });
 </script>
 @endsection

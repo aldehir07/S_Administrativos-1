@@ -17,7 +17,7 @@ class Movimiento extends Model
         'lote',
         'fecha_vencimiento',
         'solicitante_id',
-        'responsable',
+        'responsable_id',
         'motivo',
         'observaciones'
     ];
@@ -33,5 +33,9 @@ class Movimiento extends Model
     public function producto()
     {
         return $this->belongsTo(Producto::class);
+    }
+
+    public function responsable(){
+        return $this->belongsTo(Responsable::class);
     }
 }

@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('certificados', function (Blueprint $table) {
+        Schema::create('responsables', function (Blueprint $table) {
             $table->id();
-            $table->string('evento');
-            $table->integer('cantidad')->default(0);
-            $table->string('responsable');
-            $table->date('fecha');
-            $table->integer('stock_actual')->default(0);
+            $table->string('nombre', 10);
+            $table->string('piso', 10);
             $table->timestamps();
+
         });
+
+        //Insertar los valores iniciales
+        DB::table('responsables')->insert([
+            ['nombre' => 'Arline Tuñon'],
+            ['nombre' => 'Luis Urriola'],
+            ['nombre' => 'Otro']
+        ]);
     }
 
     /**
@@ -27,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('certificados');
+        Schema::dropIfExists('responsables');
     }
 };

@@ -7,6 +7,7 @@ use App\Models\Movimiento;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Solicitante;
+use App\Models\Responsable;
 
 class MovimientoController extends Controller
 {
@@ -29,8 +30,9 @@ class MovimientoController extends Controller
         $clasificaciones = Clasificacion::all(); //Obtiene todos las clasificaciones disponibles
         $productos = Producto::with('clasificacion')->get(); //Obtiene todos los productos junto con su clasificacion
         $solicitantes = Solicitante::all(); //Obtiene todos los solicitantes
+        $responsables = Responsable::all(); // Obtiene todos los responsable
         $producto_id = $request->get('producto_id');//Obtiene el ID del producto desde la solicitud, si se proporciona
-        return view('movimientos.create', compact('clasificaciones', 'productos', 'solicitantes', 'movimientos', 'producto_id'));
+        return view('movimientos.create', compact('clasificaciones', 'productos', 'solicitantes', 'movimientos', 'producto_id', 'responsables'));
     }
 
     /**
@@ -39,6 +41,15 @@ class MovimientoController extends Controller
 
     public function store(Request $request)
     {
+        // Debug temporal para ver qué campos se están recibiendo
+        // if ($request->tipo_movimiento == "Salida") {
+        //     \Log::info('Campos recibidos en Salida:', [
+        //         'responsable_salida' => $request->responsable_salida,
+        //         'evento' => $request->evento,
+        //         'todos_los_campos' => $request->all()
+        //     ]);
+        // }
+
         // BLOQUE DE SALIDA
         if ($request->tipo_movimiento == "Salida") {
             //Validacion de los datos necesarios para procesar salidas
@@ -100,7 +111,7 @@ class MovimientoController extends Controller
                             'lote' => $mov->lote,
                             'fecha_vencimiento' => $mov->fecha_vencimiento,
                             'solicitante_id' => $request->solicitante_id,
-                            'responsable' => $request->responsable,
+                            'responsable' => $request->responsable_salida,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
                         ]);
@@ -134,7 +145,7 @@ class MovimientoController extends Controller
                             'clasificacion_id' => $request->clasificacion_id,
                             'evento' => $request->evento,
                             'solicitante_id' => $request->solicitante_id,
-                            'responsable' => $request->responsable,
+                            'responsable' => $request->responsable_salida,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
                         ]);
@@ -241,7 +252,7 @@ class MovimientoController extends Controller
                 'clasificacion_id' => $request->clasificacion_id,
                 'cantidad' => $request->cantidad,
                 'fecha' => $request->fecha,
-                'responsable' => $request->responsable,
+                'responsable' => $request->responsable_certificado,
                 'evento' => $request->evento,
                 'observaciones' => $request->observaciones
             ]);
@@ -277,6 +288,20 @@ class MovimientoController extends Controller
                     'fecha_vencimiento' => 'required|date|after:today',
                 ]);
             }
+        }
+
+        // Validación para campos requeridos según el tipo de movimiento
+        if ($request->tipo_movimiento == 'Salida') {
+            $request->validate([
+                'responsable_salida' => 'required|string',
+                'evento' => 'required|string',
+            ]);
+        }
+
+        if ($request->tipo_movimiento == 'Certificado') {
+            $request->validate([
+                'responsable_certificado' => 'required|string',
+            ]);
         }
 
         //Crea el movimiento
