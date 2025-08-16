@@ -140,7 +140,7 @@
                         <label class="form-label">Lote <small class="text-muted">(Opcional - Para productos comestibles)</small></label>
                         <input type="text" name="lote" class="form-control" placeholder="Dejar vacío si no aplica">
                         <small class="form-text text-muted">
-                            <i class="fas fa-info-circle"></i> 
+                            <i class="fas fa-info-circle"></i>
                             Los lotes son obligatorios para productos comestibles. Para otros productos, puede dejarse vacío.
                         </small>
                     </div>
@@ -240,14 +240,14 @@
                     <!-- @if($movimientos->count() > 0)
                     <tr class="table-warning">
                         <td colspan="13" class="text-center">
-                            <strong>DEBUG:</strong> 
-                            Primer movimiento - Tipo: {{ $movimientos->first()->tipo_movimiento }}, 
-                            Responsable: "{{ $movimientos->first()->responsable ?? 'NULL' }}", 
+                            <strong>DEBUG:</strong>
+                            Primer movimiento - Tipo: {{ $movimientos->first()->tipo_movimiento }},
+                            Responsable: "{{ $movimientos->first()->responsable ?? 'NULL' }}",
                             Evento: "{{ $movimientos->first()->evento ?? 'NULL' }}"
                         </td>
                     </tr>
                     @endif -->
-                    
+
                     @foreach ($movimientos as $mov)
                     <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
                         <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
@@ -363,7 +363,7 @@
 
         tipoRegistro.addEventListener('change', function() {
             const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
-            
+
             // Ocultar todos los campos y remover required
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => {
@@ -490,12 +490,12 @@
 
         // Al cargar, aplicar filtro "Todos"
         aplicarFiltro('');
-        
+
         // Ejecutar la lógica de required al cargar la página
         if (tipoRegistro.value) {
             tipoRegistro.dispatchEvent(new Event('change'));
         }
-        
+
         // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
         @if(isset($producto_id))
             //Forzar seleccion y mostrar campos de ENtrada

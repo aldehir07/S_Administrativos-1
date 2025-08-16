@@ -225,7 +225,7 @@ class MovimientoController extends Controller
         }
         // ---- FIN BLOQUE DESCARTE ----
 
-        
+
         // ---- AQUI VA EL BLOQUE DE CERTIFICADO ----
         // Validar que el tipo de movimiento sea 'Certificado'
         if ($request->tipo_movimiento == 'Certificado') {
@@ -280,7 +280,7 @@ class MovimientoController extends Controller
         // Validación condicional para lotes en productos comestibles
         if ($request->tipo_movimiento == 'Entrada') {
             $producto = Producto::with('clasificacion')->find($request->producto_id);
-            
+
             // Si es un producto comestible, el lote es obligatorio
             if ($producto->clasificacion && in_array(strtolower($producto->clasificacion->nombre), ['comestibles', 'alimentos', 'bebidas', 'perecederos'])) {
                 $request->validate([
