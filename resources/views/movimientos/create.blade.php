@@ -2,8 +2,6 @@
 @section('content')
 
 <div class="container">
-
-
     @if(session('alerta_stock'))
     <div style="position:fixed;top:0;left:0;width:100%;z-index:9999;" class="bg-warning text-dark text-center py-3 fw-bold fs-5 shadow">
         <i class="fas fa-exclamation-triangle"></i>
@@ -40,9 +38,7 @@
                 <label class="form-label fw-bold">Tipo de Registro</label>
                 <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
                     <option value="" {{ !old('tipo_movimiento') && !isset($producto_id) ? 'selected' : '' }}>Seleccione</option>
-                    <option value="Entrada"
-                        {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>
-                        Entrada</option>
+                    <option value="Entrada" {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>Entrada</option>
                     <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                     <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
                     <option value="Certificado" {{ old('tipo_movimiento') == 'Certificado' ? 'selected' : '' }}>Certificado</option>
@@ -58,8 +54,7 @@
                         <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
                             <option value="" disabled>Seleccione</option>
                             @foreach ($clasificaciones as $clasificacion)
-                            <option value="{{ $clasificacion->id }}"
-                                {{ (isset($producto_id) && $productos->find($producto_id)?->clasificacion_id == $clasificacion->id) ? 'selected' : '' }}>
+                            <option value="{{ $clasificacion->id }}" {{ (isset($producto_id) && $productos->find($producto_id)?->clasificacion_id == $clasificacion->id) ? 'selected' : '' }}>
                                 {{ $clasificacion->nombre }}
                             </option>
                             @endforeach
@@ -114,7 +109,7 @@
                     </div>
 
                     <!-- Evento/Destino -->
-                    <div class="mb-3 salida-campos  d-none">
+                    <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Evento / Destino</label>
                         <input type="text" name="evento" class="form-control">
                     </div>
@@ -128,7 +123,6 @@
 
                 <!-- Columna Derecha -->
                 <div class="col-md-6">
-
                     <!-- Fecha -->
                     <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Fecha</label>
@@ -152,7 +146,7 @@
                     </div>
 
                     <!-- Solicitado Por -->
-                    <div class="mb-3 salida-campos  d-none">
+                    <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Solicitado por</label>
                         <select name="solicitante_id" class="form-select">
                             <option value="" disabled selected>Seleccione</option>
@@ -162,23 +156,18 @@
                         </select>
                     </div>
 
-                    <!-- Responsable para Salida -->
-                    <div class="mb-3 salida-campos d-none">
+                    <!-- RESPONSABLE -->
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Responsable</label>
-                        <select name="responsable_salida" class="form-select">
-                            <option value="" disabled selected>Seleccione</option>
-                            <option value="Arline Tuñon">Arline Tuñon</option>
-                            <option value="Luis Urriola">Luis Urriola</option>
-                            <option value="Otro">Otro</option>
+                        <select name="responsable_id" id="responsable_id" class="form-select" required>
+                            <option value="">Seleccione responsable</option>
+                            @foreach ($responsables as $responsable)
+                                <option value="{{ $responsable->id }}">
+                                    {{ $responsable->nombre }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-
-                    <!-- Responsable para Certificado -->
-                    <div class="mb-3 certificado-campos d-none">
-                        <label class="form-label">Responsable</label>
-                        <input type="text" name="responsable_certificado" class="form-control" placeholder="Nombre del responsable">
-                    </div>
-
 
                     <!-- Motivo de Descarte -->
                     <div class="mb-3 descarte-campos d-none">
@@ -200,102 +189,86 @@
         </div>
     </div>
 
-
     <div class="card mt-5">
-
         <div class="card-header" style="background:#3177bf">
             <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Registro de Movimientos</h4>
         </div>
 
-    <div class="card-body">
-        <div class="mb-3">
-            <button type="button" class="btn btn-outline-secondary btn-sm filtro-movimiento active" data-tipo="">Todos</button>
-            <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
-            <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
-            <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
-            <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
+        <div class="card-body">
+            <div class="mb-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm filtro-movimiento active" data-tipo="">Todos</button>
+                <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
+                <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
+                <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
+                <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
+            </div>
+
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover table-striped" id="tabla">
+                    <thead>
+                        <tr class="table-info">
+                            <th class="col-entrada col-salida col-descarte">Clasificación</th>
+                            <th class="col-entrada col-salida col-descarte">Producto</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
+                            <th class="col-entrada col-certificado">Observaciones</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
+                            <th class="col-salida">Solicitado por</th>
+                            <th class="col-entrada">Fecha de Vencimiento</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">Responsable</th>
+                            <th class="col-salida">Evento</th>
+                            <th class="col-descarte">Motivo</th>
+                            <th class="col-salida col-entrada">Lote</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                        @foreach ($movimientos as $mov)
+                        <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
+                            <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
+                            <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
+                            <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>
+                            <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
+                            <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">
+                                @if ($mov->tipo_movimiento === 'Entrada')
+                                    <span class="badge bg-success">Entrada</span>
+                                @elseif ($mov->tipo_movimiento === 'Descarte')
+                                    <span class="badge bg-warning">Descarte</span>
+                                @elseif ($mov->tipo_movimiento === 'Salida')
+                                    <span class="badge bg-danger">Salida</span>
+                                @elseif ($mov->tipo_movimiento === 'Certificado')
+                                    <span class="badge bg-info text-dark">Certificado</span>
+                                @endif
+                            </td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->responsable->nombre ?? '' }}</td>
+                            <td class="col-salida">{{ $mov->evento }}</td>
+                            <td class="col-descarte">{{ $mov->motivo }}</td>
+                            <td class="col-salida col-entrada">{{ $mov->lote }}</td>
+                            <td>
+                                <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('movimiento.destroy', $mov->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estas seguro de que desea eliminar este movimiento?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="table-responsive text-nowrap">
-            <table class="table table-hover table-striped" id="tabla">
-                <thead>
-                    <tr class="table-info">
-                        <th class="col-entrada col-salida col-descarte">Clasificación</th>
-                        <th class="col-entrada col-salida col-descarte">Producto</th>
-                        <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
-                        <th class="col-entrada col-certificado">Observaciones</th>
-                        <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
-                        <th class="col-salida">Solicitado por</th>
-                        <th class="col-entrada" >Fecha de Vencimiento</th>
-                        <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
-                        <th class="col-salida col-certificado">Responsable</th>
-                        <th class="col-salida">Evento</th>
-                        <th class="col-descarte">Motivo</th>
-                        <th class="col-salida col-entrada">Lote</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                    <!-- Fila de debug temporal -->
-                    <!-- @if($movimientos->count() > 0)
-                    <tr class="table-warning">
-                        <td colspan="13" class="text-center">
-                            <strong>DEBUG:</strong>
-                            Primer movimiento - Tipo: {{ $movimientos->first()->tipo_movimiento }},
-                            Responsable: "{{ $movimientos->first()->responsable ?? 'NULL' }}",
-                            Evento: "{{ $movimientos->first()->evento ?? 'NULL' }}"
-                        </td>
-                    </tr>
-                    @endif -->
-
-                    @foreach ($movimientos as $mov)
-                    <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
-                        <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
-                        <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
-                        <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
-                        <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
-                        <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>
-                        <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
-                        <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
-                        <td class="col-entrada col-salida col-descarte col-certificado">
-                            @if ($mov->tipo_movimiento === 'Entrada')
-                                <span class="badge bg-success">Entrada</span>
-                            @elseif ($mov->tipo_movimiento === 'Descarte')
-                                <span class="badge bg-warning">Descarte</span>
-                            @elseif ($mov->tipo_movimiento === 'Salida')
-                                <span class="badge bg-danger">Salida</span>
-                            @elseif ($mov->tipo_movimiento === 'Certificado')
-                                <span class="badge bg-info text-dark">Certificado</span>
-                            @endif
-                        </td>
-                        <td class="col-salida col-certificado">{{ $mov->responsable }}</td>
-                        <td class="col-salida">{{ $mov->evento }}</td>
-                        <td class="col-descarte">{{ $mov->motivo }}</td>
-                        <td class="col-salida col-entrada">{{ $mov->lote }}</td>
-                        <td>
-                            <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('movimiento.destroy', $mov->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estas seguro de que desea eliminar este movimiento?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     </div>
 </div>
 
 <!-- JavaScript para alternar campos -->
-
 <script>
     $(document).ready(function() {
         $('#tabla').DataTable({
@@ -308,34 +281,30 @@
     document.addEventListener('DOMContentLoaded', function() {
         const tipoRegistro = document.getElementById('tipoRegistro');
         const clasificacionSelect = document.getElementById('clasificacionSelect');
-        const productoSelect = document.getElementById('productoSelect');
         const productosSalidaContainer = document.getElementById('productosSalidaContainer');
 
         function toggleProductosSalida() {
             if (tipoRegistro.value === 'Salida') {
                 productosSalidaContainer.classList.remove('d-none');
-                // Agrega required a los campos de Salida
                 document.querySelectorAll('.producto-salida-select').forEach(el => el.setAttribute('required', 'required'));
                 document.querySelectorAll('input[name="cantidades_salida[]"]').forEach(el => el.setAttribute('required', 'required'));
             } else {
                 productosSalidaContainer.classList.add('d-none');
-                // Quita required a los campos de Salida
                 document.querySelectorAll('.producto-salida-select').forEach(el => el.removeAttribute('required'));
                 document.querySelectorAll('input[name="cantidades_salida[]"]').forEach(el => el.removeAttribute('required'));
             }
         }
 
         tipoRegistro.addEventListener('change', toggleProductosSalida);
-        toggleProductosSalida(); // Ejecutar al cargar
+        toggleProductosSalida();
 
-        // Cuando agregues una nueva fila, también debes actualizar su select de producto
+        // Agregar producto de salida
         document.getElementById('agregarProductoSalida').addEventListener('click', function() {
             const row = document.querySelector('.producto-salida-row').cloneNode(true);
             row.querySelector('select').value = '';
             row.querySelector('input').value = '';
             document.getElementById('productosSalidaRows').appendChild(row);
 
-            // Actualiza el select de producto de la nueva fila según la clasificación seleccionada
             const clasificacionId = clasificacionSelect.value;
             const productoSelect = row.querySelector('.producto-salida-select');
             if (clasificacionId) {
@@ -352,6 +321,7 @@
             }
         });
 
+        // Remover producto de salida
         document.getElementById('productosSalidaRows').addEventListener('click', function(e) {
             if (e.target.classList.contains('remove-producto-salida')) {
                 const rows = document.querySelectorAll('.producto-salida-row');
@@ -361,14 +331,13 @@
             }
         });
 
+        // Mostrar/ocultar campos según tipo de movimiento
         tipoRegistro.addEventListener('change', function() {
             const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
 
-            // Ocultar todos los campos y remover required
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => {
                     el.classList.add('d-none');
-                    // Remover required de todos los campos
                     el.querySelectorAll('input, select, textarea').forEach(campo => {
                         campo.removeAttribute('required');
                     });
@@ -379,25 +348,45 @@
                 const seleccionado = this.value.toLowerCase();
                 document.querySelectorAll(`.${seleccionado}-campos`).forEach(el => {
                     el.classList.remove('d-none');
-                    // Agregar required a los campos del tipo seleccionado
                     if (seleccionado === 'salida') {
-                        const responsableSalida = el.querySelector('select[name="responsable_salida"]');
                         const evento = document.querySelector('input[name="evento"]');
-                        if (responsableSalida) responsableSalida.setAttribute('required', 'required');
                         if (evento) evento.setAttribute('required', 'required');
                     }
-                    if (seleccionado === 'certificado') {
-                        const responsableCertificado = el.querySelector('input[name="responsable_certificado"]');
-                        if (responsableCertificado) responsableCertificado.setAttribute('required', 'required');
-                    }
                 });
+
+                // ACTUALIZAR RESPONSABLES SEGÚN TIPO DE MOVIMIENTO
+                actualizarResponsables(this.value);
             }
         });
 
+        // FUNCIÓN PARA ACTUALIZAR RESPONSABLES
+        function actualizarResponsables(tipoMovimiento) {
+            const responsableSelect = document.getElementById('responsable_id');
+            if (!responsableSelect) return;
+
+            let responsablesDisponibles = [];
+
+            if (tipoMovimiento === 'Salida') {
+                // Para Salida: todos los responsables
+                responsablesDisponibles = @json($responsables);
+            } else {
+                // Para otros tipos: solo responsables completos
+                responsablesDisponibles = @json($responsables->where('tipo', 'completo'));
+            }
+
+            let options = '<option value="">Seleccione responsable</option>';
+            responsablesDisponibles.forEach(responsable => {
+                const piso = responsable.piso ? ` - ${responsable.piso}` : '';
+                options += `<option value="${responsable.id}">${responsable.nombre}${piso}</option>`;
+            });
+
+            responsableSelect.innerHTML = options;
+        }
+
+        // Actualizar productos según clasificación
         clasificacionSelect.addEventListener('change', function() {
             const clasificacionId = this.value;
 
-            // Actualiza los selects de productos dinámicos (Salida)
             document.querySelectorAll('.producto-salida-select').forEach(function(productoSelect) {
                 productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
                 fetch(`/productos/por-clasificacion/${clasificacionId}`)
@@ -411,7 +400,6 @@
                     });
             });
 
-            // Actualiza el select de producto único (Entrada, Descarte)
             const productoUnicoSelect = document.getElementById('productoSelectUnico');
             if (productoUnicoSelect) {
                 productoUnicoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
@@ -427,21 +415,17 @@
             }
         });
 
-        // Mapeo de columnas por tipo
+        // Filtros de tabla
         const columnasPorTipo = {
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
             'Certificado': ['col-certificado']
-
         };
 
-        // Función para aplicar filtros
         function aplicarFiltro(tipo) {
-            // Actualizar botones activos
             document.querySelectorAll('.filtro-movimiento').forEach(b => {
-                b.classList.remove('active');
-                b.classList.remove('btn-primary');
+                b.classList.remove('active', 'btn-primary');
                 b.classList.add('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
             });
 
@@ -451,17 +435,14 @@
                 botonActivo.classList.remove('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
             }
 
-            // Mostrar/ocultar columnas
             const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte', 'col-certificado'];
 
-            // Ocultar todas las columnas específicas primero
             document.querySelectorAll('th, td').forEach(el => {
                 if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
                     el.style.display = 'none';
                 }
             });
 
-            // Mostrar las columnas del tipo seleccionado
             if (mostrar && mostrar.length > 0) {
                 mostrar.forEach(clase => {
                     document.querySelectorAll('.' + clase).forEach(el => {
@@ -470,7 +451,6 @@
                 });
             }
 
-            // Filtrar filas
             document.querySelectorAll('.fila-movimiento').forEach(function(row) {
                 if (!tipo || row.getAttribute('data-tipo') === tipo) {
                     row.style.display = '';
@@ -480,7 +460,6 @@
             });
         }
 
-        // Event listeners para los botones de filtro
         document.querySelectorAll('.filtro-movimiento').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const tipo = this.getAttribute('data-tipo');
@@ -488,17 +467,13 @@
             });
         });
 
-        // Al cargar, aplicar filtro "Todos"
         aplicarFiltro('');
 
-        // Ejecutar la lógica de required al cargar la página
         if (tipoRegistro.value) {
             tipoRegistro.dispatchEvent(new Event('change'));
         }
 
-        // Al cargar, si hay producto_id (viene desde el card), muestra los campos de Entrada automáticamente
         @if(isset($producto_id))
-            //Forzar seleccion y mostrar campos de ENtrada
             tipoRegistro.value = 'Entrada';
             tipoRegistro.dispatchEvent(new Event('change'));
         @endif

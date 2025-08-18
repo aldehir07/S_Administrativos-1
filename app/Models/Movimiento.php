@@ -35,7 +35,10 @@ class Movimiento extends Model
         return $this->belongsTo(Producto::class);
     }
 
-    public function responsable(){
+    // Relación con Responsable
+    public function responsable()
+    {
         return $this->belongsTo(Responsable::class);
     }
+
 }

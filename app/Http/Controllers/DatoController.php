@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Certificado;
+
 use App\Models\Clasificacion;
 use App\Models\Dato;
 use App\Models\Producto;
@@ -48,23 +48,11 @@ class DatoController extends Controller
             ->filter();
 
         // Estadísticas generales
-        $totalCertificados = Certificado::count();
+
         $totalProductos = Producto::count();
         $productosSinStock = Producto::where('stock_actual', 0)->count();
         $productosStockExcesivo = Producto::whereRaw('stock_actual > (stock_minimo * 3)')->count();
 
-        // Estadísticas de certificados
-        $stockCertificados = Certificado::sum('stock_actual');
-        $certificadosUsados = Certificado::where('stock_actual', 0)->sum('cantidad');
-        $certificadosAgregados = Certificado::where('stock_actual', '>', 0)->sum('cantidad');
-        $ultimosCertificadosUsados = Certificado::where('stock_actual', 0)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
-
-        // Calcular certificados descuentados (movimientos de tipo "Certificado")
-        $certificadosDescuentados = Movimiento::where('tipo_movimiento', 'Certificado')
-            ->sum('cantidad');
 
         // Productos que necesitan reabastecimiento (stock actual <= stock mínimo)
         $productosNecesitanReabastecimiento = $productosCriticos->count();
@@ -89,7 +77,7 @@ class DatoController extends Controller
         //Filtros de fecha
         $desde = $request->input('desde');
         $hasta = $request->input('hasta');
-        
+
         // Consulta para productos más utilizados
         $productosMasUsados = Movimiento::selectRaw('producto_id, SUM(cantidad) as total_usada')
             ->when($desde, function($query) use ($desde) {
@@ -104,7 +92,7 @@ class DatoController extends Controller
             ->with('producto')
             ->take(10) // Top 10
             ->get();
-        
+
         //Mostrar el stock por lote y fecha de vencimeinto
         $inventario = Movimiento::select('producto_id', 'lote', 'fecha_vencimiento')
             ->selectRaw('SUM(CASE WHEN tipo_movimiento="Entrada" THEN cantidad ELSE -cantidad END) as stock_lote')
@@ -131,15 +119,14 @@ class DatoController extends Controller
             'productosSinMovimiento',
             'productosPorClasificacion',
             'ultimosMovimientos',
-            'totalCertificados',
             'stockCertificados',
-            'certificadosUsados',
-            'certificadosAgregados',
-            'ultimosCertificadosUsados',
+
+
+
             'productosMasUsados',
             'inventario',
             'stockCertificados',
-            'certificadosDescuentados'
+
         ));
     }
 

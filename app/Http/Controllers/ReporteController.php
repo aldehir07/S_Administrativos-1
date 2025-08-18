@@ -8,6 +8,8 @@ use App\Models\Producto;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+
+
 class ReporteController extends Controller
 {
     /**
@@ -55,7 +57,7 @@ class ReporteController extends Controller
         return view('reportes.index', compact('movimientos', 'productos', 'productosMasUsados'));
     }
 
-    //Funcion para export a PDF 
+    //Funcion para export a PDF
     public function exportarPDF(Request $request){
 
         $query = Movimiento::query()->with('producto');
@@ -91,7 +93,7 @@ class ReporteController extends Controller
             'totalCertificados' => $totalCertificados,
             'fechaReporte' => now()->format('d/m/Y H:i:s')
         ];
-    
+
     $pdf = Pdf::loadView('reportes.pdf', $data);
 
     return $pdf->download('reporte-movimientos-' . now()->format('Y-m-d') . '.pdf');

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\DatoController;
 use App\Http\Controllers\BienesController;
 use App\Http\Controllers\EquipoController;
@@ -18,9 +17,7 @@ Route::get('/', [MainController::class, 'index'])->name('layouts.app');
 Route::middleware('auth', 'admin')->group(function() {
     Route::resource('producto', ProductoController::class);
     Route::resource('movimiento', MovimientoController::class);
-    Route::resource('certificados', CertificadoController::class);
-    Route::post('certificados/agregar-stock', [CertificadoController::class, 'agregarStock'])->name('certificados.agregar-stock');
-    
+
 });
 
 
@@ -30,6 +27,7 @@ Route::resource('datos', DatoController::class);
 Route::resource('/bienes', BienesController::class);
 Route::resource('/materiales', MaterialController::class);
 Route::resource('/equipos', EquipoController::class);
+
 
 route::get('/login', [UsuarioController::class, 'loginfrm'])->name('login');
 route::post('/login', [UsuarioController::class, 'login'])->name('loginpost');

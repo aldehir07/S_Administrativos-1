@@ -24,41 +24,49 @@ class MovimientoController extends Controller
      */
     public function create(Request $request)
     {
+        $movimientos = Movimiento::with(['producto', 'solicitante', 'clasificacion'])->latest()->get();
+        $clasificaciones = Clasificacion::all();
+        $productos = Producto::with('clasificacion')->get();
+        $solicitantes = Solicitante::all();
+        $producto_id = $request->get('producto_id');
 
-        $movimientos = Movimiento::with(['producto', 'solicitante', 'clasificacion'])->latest()->get(); //Ontene todos los moviminetos mas recientes junto con sus relaciones: producto, solicitante y clasificacion
-        // dd($movimientos);
-        $clasificaciones = Clasificacion::all(); //Obtiene todos las clasificaciones disponibles
-        $productos = Producto::with('clasificacion')->get(); //Obtiene todos los productos junto con su clasificacion
-        $solicitantes = Solicitante::all(); //Obtiene todos los solicitantes
-        $responsables = Responsable::all(); // Obtiene todos los responsable
-        $producto_id = $request->get('producto_id');//Obtiene el ID del producto desde la solicitud, si se proporciona
-        return view('movimientos.create', compact('clasificaciones', 'productos', 'solicitantes', 'movimientos', 'producto_id', 'responsables'));
+         // Obtener responsables según el tipo de movimiento
+         $tipo_movimiento = $request->get('tipo_movimiento');
+         if ($tipo_movimiento && $tipo_movimiento !== 'Salida') {
+             // Para Entrada, Descarte, Certificado: solo responsables completos
+             $responsables = Responsable::activos()->completos()->get();
+         } else {
+             // Para Salida: todos los responsables activos
+             $responsables = Responsable::activos()->get();
+         }
+
+         $producto_id = $request->get('producto_id');
+         return view('movimientos.create', compact('clasificaciones', 'productos', 'solicitantes', 'movimientos', 'producto_id', 'responsables'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-
     public function store(Request $request)
     {
-        // Debug temporal para ver qué campos se están recibiendo
-        // if ($request->tipo_movimiento == "Salida") {
-        //     \Log::info('Campos recibidos en Salida:', [
-        //         'responsable_salida' => $request->responsable_salida,
-        //         'evento' => $request->evento,
-        //         'todos_los_campos' => $request->all()
-        //     ]);
-        // }
-
         // BLOQUE DE SALIDA
         if ($request->tipo_movimiento == "Salida") {
-            //Validacion de los datos necesarios para procesar salidas
             $request->validate([
                 'productos_salida' => 'required|array|min:1',
                 'cantidades_salida' => 'required|array|min:1',
                 'productos_salida.*' => 'required|exists:productos,id',
                 'cantidades_salida.*' => 'required|integer|min:1',
+                'responsable_id' => 'required|exists:responsables,id',
+                'evento' => 'required|string',
             ]);
+
+            // Validar que el responsable pueda hacer salidas
+            $responsable = Responsable::find($request->responsable_id);
+            if (!$responsable || !$responsable->activo) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'El responsable seleccionado no es válido.'
+                ]);
+            }
 
             $alerta_stock = [];
             $errores_stock = [];
@@ -111,7 +119,7 @@ class MovimientoController extends Controller
                             'lote' => $mov->lote,
                             'fecha_vencimiento' => $mov->fecha_vencimiento,
                             'solicitante_id' => $request->solicitante_id,
-                            'responsable' => $request->responsable_salida,
+                            'responsable_id' => $request->responsable_id,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
                         ]);
@@ -121,8 +129,7 @@ class MovimientoController extends Controller
                         if ($cantidad_restante <= 0) break;
                     }
                 } else {
-                    // Si no hay lotes, procesar como salida sin lote (para productos existentes)
-                    // Buscar entradas sin lote o con stock disponible
+                    // Si no hay lotes, procesar como salida sin lote
                     $stock_disponible = Movimiento::where('producto_id', $producto_id)
                         ->where('tipo_movimiento', 'Entrada')
                         ->whereNull('lote')
@@ -145,7 +152,7 @@ class MovimientoController extends Controller
                             'clasificacion_id' => $request->clasificacion_id,
                             'evento' => $request->evento,
                             'solicitante_id' => $request->solicitante_id,
-                            'responsable' => $request->responsable_salida,
+                            'responsable_id' => $request->responsable_id,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
                         ]);
@@ -186,8 +193,25 @@ class MovimientoController extends Controller
             ]);
         }
 
-        // ---- AQUI VA EL BLOQUE DE DESCARTE ----
+        // ---- BLOQUE DE DESCARTE ----
         if ($request->tipo_movimiento == 'Descarte') {
+            $request->validate([
+                'responsable_id' => 'required|exists:responsables,id',
+            ]);
+
+            // Validar que el responsable pueda hacer descartes
+            $responsable = Responsable::find($request->responsable_id);
+            if (!$responsable || !$responsable->activo) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'El responsable seleccionado no es válido.'
+                ]);
+            }
+            if (!$responsable->puedeHacer('Descarte')) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'El responsable seleccionado no tiene permisos para realizar descartes.'
+                ]);
+            }
+
             $producto = Producto::find($request->producto_id);
 
             // Validar stock suficiente
@@ -206,6 +230,7 @@ class MovimientoController extends Controller
                 'clasificacion_id' => $request->clasificacion_id,
                 'lote' => $request->lote,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
+                'responsable_id' => $request->responsable_id,
                 'motivo' => $request->motivo,
                 'observaciones' => $request->observaciones
             ]);
@@ -223,19 +248,31 @@ class MovimientoController extends Controller
                 'alerta_stock' => $alerta_stock
             ]);
         }
-        // ---- FIN BLOQUE DESCARTE ----
 
-
-        // ---- AQUI VA EL BLOQUE DE CERTIFICADO ----
-        // Validar que el tipo de movimiento sea 'Certificado'
+        // ---- BLOQUE DE CERTIFICADO ----
         if ($request->tipo_movimiento == 'Certificado') {
             $request->validate([
                 'producto_id' => 'required|exists:productos,id',
                 'clasificacion_id' => 'required|exists:clasificaciones,id',
                 'cantidad' => 'required|integer|min:1',
                 'fecha' => 'required|date',
-                'responsable' => 'required|string',
+                'responsable_id' => 'required|exists:responsables,id',
             ]);
+
+            // Validar que el responsable pueda hacer certificados
+            $responsable = Responsable::find($request->responsable_id);
+            if (!$responsable || !$responsable->activo) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'El responsable seleccionado no es válido.'
+                ]);
+            }
+
+            if (!$responsable->puedeHacer('Certificado')) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'El responsable seleccionado no tiene permisos para realizar certificados.'
+                ]);
+            }
+
             $producto = Producto::find($request->producto_id);
 
             // Validar stock suficiente
@@ -252,7 +289,6 @@ class MovimientoController extends Controller
                 'clasificacion_id' => $request->clasificacion_id,
                 'cantidad' => $request->cantidad,
                 'fecha' => $request->fecha,
-                'responsable' => $request->responsable_certificado,
                 'evento' => $request->evento,
                 'observaciones' => $request->observaciones
             ]);
@@ -271,11 +307,26 @@ class MovimientoController extends Controller
             ]);
         }
 
-        // Para Entrada, Descarte, Certificados (uno solo)
+        // Para Entrada y otros tipos
         $request->validate([
             'producto_id' => 'required|exists:productos,id',
             'cantidad' => 'required|integer|min:1',
+            'responsable_id' => 'required|exists:responsables,id',
         ]);
+
+        // Validar que el responsable pueda hacer este tipo de movimiento
+        $responsable = Responsable::find($request->responsable_id);
+        if (!$responsable || !$responsable->activo) {
+            return redirect()->route('movimiento.create')->with([
+                'errores_stock' => 'El responsable seleccionado no es válido.'
+            ]);
+        }
+
+        if (!$responsable->puedeHacer($request->tipo_movimiento)) {
+            return redirect()->route('movimiento.create')->with([
+                'errores_stock' => 'El responsable seleccionado no tiene permisos para realizar este tipo de movimiento.'
+            ]);
+        }
 
         // Validación condicional para lotes en productos comestibles
         if ($request->tipo_movimiento == 'Entrada') {
@@ -293,14 +344,7 @@ class MovimientoController extends Controller
         // Validación para campos requeridos según el tipo de movimiento
         if ($request->tipo_movimiento == 'Salida') {
             $request->validate([
-                'responsable_salida' => 'required|string',
                 'evento' => 'required|string',
-            ]);
-        }
-
-        if ($request->tipo_movimiento == 'Certificado') {
-            $request->validate([
-                'responsable_certificado' => 'required|string',
             ]);
         }
 
@@ -315,12 +359,12 @@ class MovimientoController extends Controller
             'lote' => $request->lote,
             'fecha_vencimiento' => $request->fecha_vencimiento,
             'solicitante_id' => $request->solicitante_id,
-            'responsable' => $request->responsable,
+            'responsable_id' => $request->responsable_id,
             'motivo' => $request->motivo,
             'observaciones' => $request->observaciones
         ]);
 
-        // Actualiza el stock segun el tipo de movimineto
+        // Actualiza el stock según el tipo de movimiento
         $producto = Producto::find($request->producto_id);
         if ($request->tipo_movimiento == 'Entrada') {
             $producto->stock_actual += $request->cantidad;
@@ -353,11 +397,10 @@ class MovimientoController extends Controller
      */
     public function edit(Movimiento $movimiento)
     {
-        //Obtiene todos los movimientos con sus relaciones de producto y solicitante
         $movimientos = Movimiento::with(['producto', 'solicitante'])->latest()->get();
-        $clasificaciones = Clasificacion::all();//Obtiene toldoas las clasificaciones disponibles
-        $productos = Producto::all();//Obtiene todos los productos disponibles
-        $solicitantes = Solicitante::all();//Obtiene todos los solicitantes disponibles
+        $clasificaciones = Clasificacion::all();
+        $productos = Producto::all();
+        $solicitantes = Solicitante::all();
         return view('movimientos.edit', compact('movimiento', 'movimientos', 'clasificaciones', 'productos', 'solicitantes'));
     }
 
@@ -376,6 +419,6 @@ class MovimientoController extends Controller
     public function destroy(Movimiento $movimiento)
     {
         $movimiento->delete();
-        return redirect()->route('movimiento.create')->with('success', 'Movimiento eliminado del incentario exitosamente!.');
+        return redirect()->route('movimiento.create')->with('success', 'Movimiento eliminado del inventario exitosamente!.');
     }
 }

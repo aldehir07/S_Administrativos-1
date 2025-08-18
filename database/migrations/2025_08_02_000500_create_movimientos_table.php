@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('tipo_movimiento');
             $table->unsignedBigInteger('producto_id'); //Relacion con productos/insumos
             $table->unsignedBigInteger('clasificacion_id');
-            $table->unsignedBigInteger('responsable_id');
+            $table->unsignedBigInteger('responsable_id')->nullable();
             $table->integer('cantidad');
             $table->date('fecha');
             $table->string('lote')->nullable();
