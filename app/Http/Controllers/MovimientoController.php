@@ -401,7 +401,8 @@ class MovimientoController extends Controller
         $clasificaciones = Clasificacion::all();
         $productos = Producto::all();
         $solicitantes = Solicitante::all();
-        return view('movimientos.edit', compact('movimiento', 'movimientos', 'clasificaciones', 'productos', 'solicitantes'));
+        $responsables = Responsable::all();
+        return view('movimientos.edit', compact('movimiento', 'movimientos', 'clasificaciones', 'productos', 'solicitantes', 'responsables'));
     }
 
     /**

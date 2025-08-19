@@ -38,7 +38,7 @@ class DatoController extends Controller
         $productosProximosVencer = Movimiento::with(['producto.clasificacion'])
             ->whereNotNull('fecha_vencimiento')
             ->where('fecha_vencimiento', '>=', Carbon::now())
-            ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(30))
+            ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(45))
             ->where('tipo_movimiento', 'Entrada')
             ->get()
             ->unique('producto_id')
@@ -52,6 +52,7 @@ class DatoController extends Controller
         $totalProductos = Producto::count();
         $productosSinStock = Producto::where('stock_actual', 0)->count();
         $productosStockExcesivo = Producto::whereRaw('stock_actual > (stock_minimo * 3)')->count();
+        
 
 
         // Productos que necesitan reabastecimiento (stock actual <= stock mínimo)
@@ -103,7 +104,17 @@ class DatoController extends Controller
             ->get();
 
         //Busca la clasificacion de "Certificados"
-        $clasificacionCertificados = Clasificacion::where('nombre', 'certificados')->first();
+        $clasificacionCertificados = Clasificacion::where('nombre', 'Certificado')->first();
+
+        $certificadosDescuentados = 0;
+        if ($clasificacionCertificados) {
+            // Suma todas las salidas de productos certificados
+            $certificadosDescuentados = \App\Models\Movimiento::where('tipo_movimiento', 'Salida')
+                ->whereHas('producto', function($q) use ($clasificacionCertificados) {
+                    $q->where('clasificacion_id', $clasificacionCertificados->id);
+                })
+                ->sum('cantidad');
+        }
 
         //Suma el stock de todos los porductos con esa clasificacion
         $stockCertificados = Producto::where('clasificacion_id', $clasificacionCertificados->id)->sum('stock_actual');
@@ -120,9 +131,7 @@ class DatoController extends Controller
             'productosPorClasificacion',
             'ultimosMovimientos',
             'stockCertificados',
-
-
-
+            'certificadosDescuentados',
             'productosMasUsados',
             'inventario',
             'stockCertificados',

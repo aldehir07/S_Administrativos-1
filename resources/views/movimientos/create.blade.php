@@ -207,8 +207,8 @@
                 <table class="table table-hover table-striped" id="tabla">
                     <thead>
                         <tr class="table-info">
-                            <th class="col-entrada col-salida col-descarte">Clasificación</th>
-                            <th class="col-entrada col-salida col-descarte">Producto</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">Clasificación</th>
+                            <th class="col-entrada col-salida col-descarte col-certificado">Producto</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
                             <th class="col-entrada col-certificado">Observaciones</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
@@ -216,17 +216,18 @@
                             <th class="col-entrada">Fecha de Vencimiento</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">Responsable</th>
-                            <th class="col-salida">Evento</th>
+                            <th class="col-salida ">Evento</th>
                             <th class="col-descarte">Motivo</th>
                             <th class="col-salida col-entrada">Lote</th>
                             <th>Acciones</th>
+                            
                         </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
                         @foreach ($movimientos as $mov)
                         <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
-                            <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
-                            <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->clasificacion->nombre ?? '' }}</td>
+                            <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->producto->nombre ?? '' }}</td>
                             <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
                             <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
                             <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>

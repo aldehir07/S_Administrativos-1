@@ -93,34 +93,28 @@
                         <input type="date" name="fecha_vencimiento" class="form-control" value="{{ $movimiento->fecha_vencimiento }}">
                     </div>
 
-                    <!-- Campo solocitado por -->
+                    <!-- Solicitado Por -->
                     <div class="mb-3 salida-campos d-none">
                         <label class="form-label">Solicitado por</label>
                         <select name="solicitante_id" class="form-select">
-                            <option value="">Seleccione</option>
+                            <option value="" disabled selected>Seleccione</option>
                             @foreach($solicitantes as $solicitante)
-                            <option value="{{ $solicitante->id }}" {{ $movimiento->solicitante_id == $solicitante->id ? 'selected' : '' }}>
-                                {{ $solicitante->nombre }}
-                            </option>
+                            <option value="{{ $solicitante->id }}">{{ $solicitante->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <!-- Responsable -->
-                    <div class="mb-3 salida-campos d-none">
+                    <!-- RESPONSABLE -->
+                    <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Responsable</label>
-                        <select name="responsable" class="form-select">
-                            <option value="" disabled selected>Seleccione</option>
-                            <option value="Arline Tuñon" {{ old('responsable', $movimiento) == 'Arline Tuñon' ? 'selected' : '' }} >Arline Tuñon</option>
-                            <option value="Luis Urriola" {{ old('responsable', $movimiento) == 'Luis Urriola' ? 'selected' : '' }}>Luis Urriola</option>
-                            <option value="Otro" {{ old('responsable', $movimiento) == 'Otros' ? 'selected' : '' }}>Otro</option>
+                        <select name="responsable_id" id="responsable_id" class="form-select" required>
+                            <option value="">Seleccione responsable</option>
+                            @foreach ($responsables as $responsable)
+                                <option value="{{ $responsable->id }}" {{ $movimiento->responsable_id == $responsable->id ? 'selected' : ''}}>
+                                    {{ $responsable->nombre }}
+                                </option>
+                            @endforeach
                         </select>
-                    </div>
-
-                    <!-- Responsable para Certificado -->
-                    <div class="mb-3 certificado-campos d-none">
-                        <label class="form-label">Responsable</label>
-                        <input type="text" name="responsable" class="form-control" placeholder="Nombre del responsable" value="{{ $movimiento->responsable }}">
                     </div>
 
                     <!-- Motivo de Descarte -->
@@ -128,9 +122,15 @@
                         <label class="form-label">Motivo de Descarte</label>
                         <select name="motivo" class="form-select">
                             <option value="" disabled selected>Seleccione</option>
-                            <option value="Dañado">Dañado</option>
-                            <option value="Vencido">Vencido</option>
-                            <option value="Otro">Otro</option>
+                            <option value="Dañado"
+                                {{ $movimiento->motivo == 'Dañado' ? 'selected' : ''}}>
+                                Dañado</option>
+                            <option value="Vencido"
+                                {{ $movimiento->motivo == 'Vencido' ? 'selected' : ''}}>
+                                Vencido</option>
+                            <option value="Otro" 
+                                {{ $movimiento->motivo == 'Otro' ? 'selected' : ''}}>
+                                Otro</option>
                         </select>
                     </div>
 

@@ -17,7 +17,7 @@ class AdminMiddleware
     {
         if(!$request->user() || $request->user()->role !== 'admin'){
             // Si no está autenticado o no es admin, redirige al dashboard con mensaje2
-            return redirect(route('datos.index'))->with('mensaje2', 'Solo personal de Servicios Administrativos puede acceder a esta sección');
+            return redirect(route('datos.index'))->with('mensaje2', 'No posee los permisos para acceder a esta sección');
         }
         return $next($request);
     }

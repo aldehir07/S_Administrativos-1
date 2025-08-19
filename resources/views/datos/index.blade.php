@@ -121,7 +121,7 @@
         <div class="col-12 col-lg-6">
             <!-- Productos Vencidos y Próximos a Vencer -->
             <div class="card h-100 shadow-sm mb-4">
-                <div class="card-header bg-danger text-white">
+                <div class="card-header bg-danger text-center">
                     <h5 class="mb-0"><i class="fas fa-times-circle"></i> Productos Vencidos ({{ $productosVencidos->count() }})</h5>
                 </div>
                 <div class="card-body p-0">
@@ -169,7 +169,7 @@
         <div class="col-12 col-lg-6">
             <!-- Productos Próximos a Vencer -->
             <div class="card h-100 shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
+                <div class="card-header bg-warning text-dark text-center">
                     <h5 class="mb-0"><i class="fas fa-clock"></i> Productos Próximos a Vencer ({{ $productosProximosVencer->count() }})</h5>
                 </div>
                 <div class="card-body p-0">
@@ -179,6 +179,7 @@
                                 <tr>
                                     <th>Producto</th>
                                     <th>Stock</th>
+                                    <th>Lote</th>
                                     <th>Fecha de Vencimiento</th>
                                 </tr>
                             </thead>
@@ -196,6 +197,7 @@
                                     <tr>
                                         <td>{{ $producto->nombre }}</td>
                                         <td>{{ $producto->stock_actual }}</td>
+                                        <td>{{ $movimientoProximo ? $movimientoProximo->lote : '-' }}</td>
                                         <td>
                                             {{ $movimientoProximo ? \Carbon\Carbon::parse($movimientoProximo->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
                                         </td>
@@ -203,7 +205,7 @@
                                 @endforeach
                                 @if($productosProximosVencer->isEmpty())
                                     <tr>
-                                        <td colspan="3" class="text-center text-success">No hay productos próximos a vencer.</td>
+                                        <td colspan="4" class="text-center text-success">No hay productos próximos a vencer.</td>
                                     </tr>
                                 @endif
                             </tbody>

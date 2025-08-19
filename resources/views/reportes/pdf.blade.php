@@ -163,7 +163,7 @@
                         <span class="badge badge-descarte">Descarte</span>
                     @endif
                 </td>
-                <td>{{ $mov->responsable ?? '-' }}</td>
+                <td>{{ $mov->responsable->nombre ?? '-' }}</td>
                 <td>{{ $mov->evento ?? '-' }}</td>
                 <td>{{ $mov->observaciones ?? '-' }}</td>
             </tr>
