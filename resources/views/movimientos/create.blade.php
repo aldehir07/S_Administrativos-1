@@ -36,12 +36,17 @@
             <!-- Tipo de Registro -->
             <div class="mb-4">
                 <label class="form-label fw-bold">Tipo de Registro</label>
+                @php $user = Auth::user(); @endphp
                 <select name="tipo_movimiento" class="form-select" id="tipoRegistro" required>
                     <option value="" {{ !old('tipo_movimiento') && !isset($producto_id) ? 'selected' : '' }}>Seleccione</option>
-                    <option value="Entrada" {{ (old('tipo_movimiento') == 'Entrada' || isset($producto_id)) ? 'selected' : '' }}>Entrada</option>
-                    <option value="Salida" {{ old('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
-                    <option value="Descarte" {{ old('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-                    <option value="Certificado" {{ old('tipo_movimiento') == 'Certificado' ? 'selected' : '' }}>Certificado</option>
+                    @if($user->role === 'admin')
+                        <option value="Entrada">Entrada</option>
+                        <option value="Salida">Salida</option>
+                        <option value="Descarte">Descarte</option>
+                        <option value="Certificado">Certificados</option>
+                    @elseif ($user->role === 'user')
+                        <option value="Salida">Salida</option>
+                    @endif
                 </select>
             </div>
 
@@ -200,7 +205,6 @@
                 <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
                 <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
                 <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
-                <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
             </div>
 
             <div class="table-responsive text-nowrap">
@@ -375,11 +379,11 @@
                 responsablesDisponibles = @json($responsables->where('tipo', 'completo'));
             }
 
-            let options = '<option value="">Seleccione responsable</option>';
-            responsablesDisponibles.forEach(responsable => {
-                const piso = responsable.piso ? ` - ${responsable.piso}` : '';
-                options += `<option value="${responsable.id}">${responsable.nombre}${piso}</option>`;
-            });
+            // let options = '<option value="">Seleccione responsable</option>';
+            // responsablesDisponibles.forEach(responsable => {
+            //     const piso = responsable.piso ? ` - ${responsable.piso}` : '';
+            //     options += `<option value="${responsable.id}">${responsable.nombre}${piso}</option>`;
+            // });
 
             responsableSelect.innerHTML = options;
         }

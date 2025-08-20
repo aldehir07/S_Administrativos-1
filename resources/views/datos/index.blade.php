@@ -20,8 +20,8 @@
     @endif
 
     <!-- Tarjetas de Estadísticas -->
-    <div class="row mb-4 g-4">
-        <div class="col-12 col-sm-6 col-md-3">
+    <div class="row mb-4 g-3">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-boxes fa-3x mb-2"></i>
@@ -30,45 +30,49 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="card text-white bg-danger h-100 shadow-sm card-hover">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-exclamation-triangle fa-3x mb-2"></i>
                     <h4 class="card-title mb-0">{{ $productosNecesitanReabastecimiento }}</h4>
-                    <p class="card-text">Stock Crítico</p>
+                    <p class="card-text">Inventario Minimo</p>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <i class="fas fa-certificate fa-3x mb-2"></i>
-                    <h4 class="card-title mb-0">{{ $stockCertificados ?? 0 }}</h4>
-                    <p class="card-text">Certificados Disponibles</p>
+                    <i class="fas fa-clock fa-3x mb-2"></i>
+                    <h4 class="card-title mb-0">{{ $productosProximosVencer->count() ?? 0 }}</h4>
+                    <p class="card-text">Productos a Vencer</p>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
+        {{-- <div class="col-12 col-sm-6 col-md-3">
             <div class="card text-white h-100 shadow-sm card-hover" style="background:#082140">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-handshake fa-3x mb-2"></i>
                     <h4 class="card-title mb-0">{{ $certificadosDescuentados ?? 0 }}</h4>
-                    <p class="card-text">Total de Certificados Usados</p>
+                    <p class="card-text">Productos a Vencer</p>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Sección de paneles principales en filas separadas -->
     <div class="row g-4">
         <!-- Productos en Stock Crítico (fila completa) -->
         <div class="col-12">
-            <div class="card h-100 shadow-sm ">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Productos en Stock Crítico</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Productos con Inventario mínimo</h5>
+                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCritico" aria-expanded="true" aria-controls="collapseCritico">
+                            <span class="collapse-toggle-text">Ocultar</span>
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div id="collapseCritico" class="card-body collapse show">
+                        <div class="row">
                         @forelse($productosCriticos as $producto)
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="card card-critico shadow-sm h-100 card-hover">
@@ -159,6 +163,7 @@
                                         <td colspan="4" class="text-center text-success">No hay productos vencidos.</td>
                                     </tr>
                                 @endif
+
                             </tbody>
                         </table>
                     </div>
@@ -216,8 +221,36 @@
         </div>
     </div>
 
-    <!--
-    Productos mas utilizados
+<!-- Fila 2: Estado de Certificados y Últimos Movimientos -->
+<div class="row mt-4 g-4">
+    {{-- <div class="col-12 col-lg-6">
+        <!-- Estado de Certificados -->
+        <div class="card border-success mb-3 shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="fas fa-certificate"></i> Estado de Certificados</h6>
+            </div>
+            <div class="card-body py-4">
+                <div class="row text-center align-items-center">
+                    <div class="col-6">
+                        <div class="display-4 fw-bold text-success mb-1" style="font-size:2.8rem;">{{ $stockCertificados ?? 0 }}</div>
+                        <div class="fs-5 text-dark">Disponibles</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-4 fw-bold text-warning mb-1" style="font-size:2.8rem;">{{ $certificadosDescuentados ?? 0 }}</div>
+                        <div class="fs-5 text-dark">Usados</div>
+                    </div>
+                </div>
+                @if(($stockCertificados ?? 0) < 50)
+                <div class="alert alert-warning mt-3 mb-0 py-2 fs-6">
+                    <i class="fas fa-exclamation-triangle"></i> Stock bajo de certificados
+                </div>
+                @endif
+            </div>
+        </div>
+    </div> --}}
+
+    
+    {{-- Productos mas utilizados --}}
     <div class="col-12 col-lg-6">
         @if($productosMasUsados->count())
         <div class="card shadow-sm h-100">
@@ -246,35 +279,8 @@
             </div>
         </div>
         @endif
-    </div> -->
-
-<!-- Fila 2: Estado de Certificados y Últimos Movimientos -->
-<div class="row mt-4 g-4">
-    <div class="col-12 col-lg-6">
-        <!-- Estado de Certificados -->
-        <div class="card border-success mb-3 shadow-sm h-100">
-            <div class="card-header bg-success text-white">
-                <h6 class="mb-0"><i class="fas fa-certificate"></i> Estado de Certificados</h6>
-            </div>
-            <div class="card-body py-4">
-                <div class="row text-center align-items-center">
-                    <div class="col-6">
-                        <div class="display-4 fw-bold text-success mb-1" style="font-size:2.8rem;">{{ $stockCertificados ?? 0 }}</div>
-                        <div class="fs-5 text-dark">Disponibles</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="display-4 fw-bold text-warning mb-1" style="font-size:2.8rem;">{{ $certificadosDescuentados ?? 0 }}</div>
-                        <div class="fs-5 text-dark">Usados</div>
-                    </div>
-                </div>
-                @if(($stockCertificados ?? 0) < 50)
-                <div class="alert alert-warning mt-3 mb-0 py-2 fs-6">
-                    <i class="fas fa-exclamation-triangle"></i> Stock bajo de certificados
-                </div>
-                @endif
-            </div>
-        </div>
     </div>
+
     <div class="col-12 col-lg-6">
         <!-- Últimos Movimientos -->
         <div class="card shadow-sm h-100">

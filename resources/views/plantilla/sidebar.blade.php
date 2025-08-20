@@ -22,10 +22,17 @@
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link"><span class="pc-micon"><i class="bi bi-fork-knife"></i></span><span class="pc-mtext">Insumos</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
                         <ul class="pc-submenu">
-                            <li class="pc-item"><a class="pc-link" href="{{ route('producto.create') }}">Productos</a></li>
-                            <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
-                            <li class="pc-item"><a class="pc-link" href="{{ route('reportes.index') }}">Reportes</a></li>
-                            {{-- <li class="pc-item"><a class="pc-link" href="{{ route('certificados.create') }}">Certificados</a></li> --}}
+                            @php $user = Auth::user(); @endphp
+                            @if($user && $user->role === 'admin')
+                                <li class="pc-item"><a class="pc-link" href="{{ route('producto.create') }}">Productos</a></li>
+                                <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
+                                <li class="pc-item"><a class="pc-link" href="{{ route('reportes.index') }}">Reportes</a></li>
+                            @elseif($user && $user->role === 'user')
+                                <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
+                                <li class="pc-item"><a class="pc-link" href="{{ route('reportes.index') }}">Reportes</a></li>
+                            @elseif($user && $user->role === 'manual')
+                                <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
+                            @endif
                         </ul>
                     </li>
                     <li class="pc-item pc-hasmenu">

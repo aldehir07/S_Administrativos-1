@@ -17,8 +17,15 @@ Route::get('/', [MainController::class, 'index'])->name('layouts.app');
 Route::middleware('auth', 'admin')->group(function() {
     Route::resource('producto', ProductoController::class);
     Route::resource('movimiento', MovimientoController::class);
-
 });
+
+Route::middleware('auth', 'user')->group(function() {
+    Route::resource('movimiento', MovimientoController::class);
+});
+
+// Route::middleware('auth', 'manual')->group(function(){
+//     Route::resource('movimiento', MovimientoController::class);
+// });
 
 
 Route::resource('usuario', UsuarioController::class);

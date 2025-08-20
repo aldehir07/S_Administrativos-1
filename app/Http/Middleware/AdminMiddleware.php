@@ -15,10 +15,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!$request->user() || $request->user()->role !== 'admin'){
+        if(!$request->user() || !in_array($request->user()->role, ['admin'])){
             // Si no está autenticado o no es admin, redirige al dashboard con mensaje2
             return redirect(route('datos.index'))->with('mensaje2', 'No posee los permisos para acceder a esta sección');
         }
+        
         return $next($request);
     }
 }

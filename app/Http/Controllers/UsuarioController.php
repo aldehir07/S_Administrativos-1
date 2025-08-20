@@ -32,7 +32,8 @@ class UsuarioController extends Controller
         Usuario::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'role' => $request->role ?? 'user',
         ]);
         return redirect(route('login'))->with('mensaje', 'Se ha registrado exitosamente!.');
     }
