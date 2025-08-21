@@ -4,4 +4,4 @@ Cambio por hacer y modificafiones por agregar
 -Certificados: quitar como tipo registro, dejar como clasificacion.
 -Solicitado por: en certificado solo Yesenoia y anabel.
 -Reportes: agregar el foltro de clasificacion, poder seleccionar productos especificos para la impresion. Agregar impresion por excel.
--Validaciones: seguir con el tema de roles.
+(HECHO) -Validaciones: seguir con el tema de roles.

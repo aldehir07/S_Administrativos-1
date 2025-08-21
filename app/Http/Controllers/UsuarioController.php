@@ -47,7 +47,7 @@ class UsuarioController extends Controller
             session(['role' => Auth::user()->role]);
             return redirect(route('datos.index'));
         }
-        return back()->with('mensaje', 'Error al iniciar session, verifique sus credenciales.');
+        return back()->with('mensaje', 'Error al iniciar sesión, verifique sus credenciales.');
     }
 
     public function logout(){

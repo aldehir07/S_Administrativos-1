@@ -30,8 +30,6 @@
                             @elseif($user && $user->role === 'user')
                                 <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
                                 <li class="pc-item"><a class="pc-link" href="{{ route('reportes.index') }}">Reportes</a></li>
-                            @elseif($user && $user->role === 'manual')
-                                <li class="pc-item"><a class="pc-link" href="{{ route('movimiento.create') }}">Movimiento</a></li>
                             @endif
                         </ul>
                     </li>

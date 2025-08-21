@@ -120,7 +120,7 @@
         </div>
     </div>
 
-<!-- Fila 1: Últimos Certificados Usados y Productos más utilizados -->
+<!-- Fila 1: Productos vencidos y Productos proximos avencer -->
     <div class="row mt-4 g-4">
         <div class="col-12 col-lg-6">
             <!-- Productos Vencidos y Próximos a Vencer -->
@@ -221,98 +221,72 @@
         </div>
     </div>
 
-<!-- Fila 2: Estado de Certificados y Últimos Movimientos -->
-<div class="row mt-4 g-4">
-    {{-- <div class="col-12 col-lg-6">
-        <!-- Estado de Certificados -->
-        <div class="card border-success mb-3 shadow-sm h-100">
-            <div class="card-header bg-success text-white">
-                <h6 class="mb-0"><i class="fas fa-certificate"></i> Estado de Certificados</h6>
-            </div>
-            <div class="card-body py-4">
-                <div class="row text-center align-items-center">
-                    <div class="col-6">
-                        <div class="display-4 fw-bold text-success mb-1" style="font-size:2.8rem;">{{ $stockCertificados ?? 0 }}</div>
-                        <div class="fs-5 text-dark">Disponibles</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="display-4 fw-bold text-warning mb-1" style="font-size:2.8rem;">{{ $certificadosDescuentados ?? 0 }}</div>
-                        <div class="fs-5 text-dark">Usados</div>
-                    </div>
-                </div>
-                @if(($stockCertificados ?? 0) < 50)
-                <div class="alert alert-warning mt-3 mb-0 py-2 fs-6">
-                    <i class="fas fa-exclamation-triangle"></i> Stock bajo de certificados
-                </div>
-                @endif
-            </div>
-        </div>
-    </div> --}}
+    <!-- Fila 2: Productos mas utilizados y Últimos Movimientos -->
+    <div class="row mt-4 g-4">
 
-    
-    {{-- Productos mas utilizados --}}
-    <div class="col-12 col-lg-6">
-        @if($productosMasUsados->count())
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-info text-white">
-                <h6 class="mb-0"><i class="fas fa-trophy"></i> Productos más utilizados</h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Total Usados</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($productosMasUsados as $item)
-                            <tr>
-                                <td>{{ $item->producto->nombre ?? '-' }}</td>
-                                <td>{{ $item->total_usada }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+        <div class="col-12 col-lg-6">
+            <!-- Últimos Movimientos -->
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-history"></i> Últimos Movimientos</h6>
+                </div>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    @forelse($ultimosMovimientos as $movimiento)
+                    <div class="d-flex align-items-center mb-2 p-2 border-bottom">
+                        <div class="me-2">
+                            @if($movimiento->tipo_movimiento === 'Entrada')
+                                <i class="fas fa-arrow-down text-success"></i>
+                            @elseif($movimiento->tipo_movimiento === 'Salida')
+                                <i class="fas fa-arrow-up text-danger"></i>
+                            @else
+                                <i class="fas fa-trash text-warning"></i>
+                            @endif
+                        </div>
+                        <div class="flex-grow-1">
+                            <small class="fw-bold">{{ $movimiento->producto->nombre ?? 'N/A' }}</small>
+                            <br>
+                            <small class="text-muted">{{ $movimiento->tipo_movimiento }} - {{ $movimiento->cantidad }}</small>
+                        </div>
+                        <small class="text-muted">{{ \Carbon\Carbon::parse($movimiento->created_at)->format('d/m') }}</small>
+                    </div>
+                    @empty
+                    <p class="text-muted text-center">No hay movimientos recientes</p>
+                    @endforelse
                 </div>
             </div>
+        </div> 
+
+        {{-- Top Productos mas utilizados --}}
+        <div class="col-12 col-lg-6">
+            @if($productosMasUsados->count())
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-trophy"></i>Top de Productos más utilizados</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Total Usados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($productosMasUsados as $item)
+                                <tr>
+                                    <td>{{ $item->producto->nombre ?? '-' }}</td>
+                                    <td>{{ $item->total_usada }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
-        @endif
     </div>
-
-    <div class="col-12 col-lg-6">
-        <!-- Últimos Movimientos -->
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-primary text-white">
-                <h6 class="mb-0"><i class="fas fa-history"></i> Últimos Movimientos</h6>
-            </div>
-            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                @forelse($ultimosMovimientos as $movimiento)
-                <div class="d-flex align-items-center mb-2 p-2 border-bottom">
-                    <div class="me-2">
-                        @if($movimiento->tipo_movimiento === 'Entrada')
-                            <i class="fas fa-arrow-down text-success"></i>
-                        @elseif($movimiento->tipo_movimiento === 'Salida')
-                            <i class="fas fa-arrow-up text-danger"></i>
-                        @else
-                            <i class="fas fa-trash text-warning"></i>
-                        @endif
-                    </div>
-                    <div class="flex-grow-1">
-                        <small class="fw-bold">{{ $movimiento->producto->nombre ?? 'N/A' }}</small>
-                        <br>
-                        <small class="text-muted">{{ $movimiento->tipo_movimiento }} - {{ $movimiento->cantidad }}</small>
-                    </div>
-                    <small class="text-muted">{{ \Carbon\Carbon::parse($movimiento->created_at)->format('d/m') }}</small>
-                </div>
-                @empty
-                <p class="text-muted text-center">No hay movimientos recientes</p>
-                @endforelse
-            </div>
-        </div>
-    </div> 
-</div>
     
 </div>
 

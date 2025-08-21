@@ -51,7 +51,7 @@ class MovimientoController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if($user->role === ' admin' && $request->tipo_movimiento !== 'Salida'){
+        if($user->role === 'user' && $request->tipo_movimiento !== 'Salida'){
             return redirect()->route('movimiento.create')->with('errores_stock', 'No tienes permiso para registrar este tipo de movimiento.');
         }
         

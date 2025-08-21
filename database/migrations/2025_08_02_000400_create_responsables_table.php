@@ -28,7 +28,7 @@ return new class extends Migration
             ['nombre' => 'Nicol Espino', 'piso' => 'Piso 1', 'tipo' => 'completo'],
             ['nombre' => 'Ilanova Barrera', 'piso' => 'Piso 2', 'tipo' => 'completo'],
             ['nombre' => 'Luis Herrera', 'piso' => 'Piso 1', 'tipo' => 'completo'],
-            ['nombre' => 'Otro', 'piso' => 'N/A', 'tipo' => 'completo']
+            ['nombre' => 'Zayuri Zoto', 'piso' => 'N/A', 'tipo' => 'completo']
         ]);
     }
 
