@@ -25,9 +25,9 @@ return new class extends Migration
          DB::table('responsables')->insert([
             ['nombre' => 'Arlene Tuñon', 'piso' => 'Piso 1', 'tipo' => 'manual'],
             ['nombre' => 'Luis Urriola', 'piso' => 'Piso 2', 'tipo' => 'manual'],
-            ['nombre' => 'Nicol Espino', 'piso' => 'Piso 1', 'tipo' => 'completo'],
-            ['nombre' => 'Ilanova Barrera', 'piso' => 'Piso 2', 'tipo' => 'completo'],
-            ['nombre' => 'Luis Herrera', 'piso' => 'Piso 1', 'tipo' => 'completo'],
+            ['nombre' => 'Nicole Espino', 'piso' => 'N/A', 'tipo' => 'completo'],
+            ['nombre' => 'Ilanova Barrera', 'piso' => 'N/A', 'tipo' => 'completo'],
+            ['nombre' => 'Luis Herrera', 'piso' => 'N/A', 'tipo' => 'completo'],
             ['nombre' => 'Zayuri Zoto', 'piso' => 'N/A', 'tipo' => 'completo']
         ]);
     }

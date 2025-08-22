@@ -22,7 +22,6 @@ return new class extends Migration
         DB::table('solicitantes')->insert([
             ['nombre' => 'Anabel Santana'],
             ['nombre' => 'Helvetia Bernal'],
-            ['nombre' => 'Liseth Rodriguez'],
             ['nombre' => 'Melanie Taylor'],
             ['nombre' => 'Veronica de Ureña'],
             ['nombre' => 'Yesenia Delgado'],

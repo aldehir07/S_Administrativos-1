@@ -37,7 +37,6 @@
                         <option value="Entrada" {{ request('tipo_movimiento') == 'Entrada' ? 'selected' : '' }}>Entrada</option>
                         <option value="Salida" {{ request('tipo_movimiento') == 'Salida' ? 'selected' : '' }}>Salida</option>
                         <option value="Descarte" {{ request('tipo_movimiento') == 'Descarte' ? 'selected' : '' }}>Descarte</option>
-                        <option value="Certificado" {{ request('tipo_movimiento') == 'Certificado' ? 'selected' : '' }}>Certificado</option>
                     </select>
                 </div>
                 <div class="col-md-1 d-grid">

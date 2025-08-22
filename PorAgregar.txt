@@ -1,7 +1,9 @@
 Cambio por hacer y modificafiones por agregar
 
 (HECHO) -Dashboard: informacion a mostrar total de productos, Inventario minimo y cantidad de productos proximos a vencer. 
--Certificados: quitar como tipo registro, dejar como clasificacion.
--Solicitado por: en certificado solo Yesenoia y anabel.
--Reportes: agregar el foltro de clasificacion, poder seleccionar productos especificos para la impresion. Agregar impresion por excel.
+(HECHO) -Certificados: quitar como tipo registro, dejar como clasificacion.
+-Modificar el campo solicitado por. en salida de certificado con dos opciones Yesenia y Anabel.
+-Modificar el campo de Responsable y quitar Arlene y Urriola.
+-Reportes: agregar el filtro de clasificacion, poder seleccionar productos especificos para la impresion. Agregar impresion por excel.
+-Revisar el tema de los fitros en la tabla de de create.
 (HECHO) -Validaciones: seguir con el tema de roles.

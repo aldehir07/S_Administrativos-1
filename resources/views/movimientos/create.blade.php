@@ -43,7 +43,6 @@
                         <option value="Entrada">Entrada</option>
                         <option value="Salida">Salida</option>
                         <option value="Descarte">Descarte</option>
-                        <option value="Certificado">Certificados</option>
                     @elseif ($user->role === 'user')
                         <option value="Salida">Salida</option>
                     @endif
@@ -164,9 +163,11 @@
                     <!-- RESPONSABLE -->
                     <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Responsable</label>
+                        
                         <select name="responsable_id" id="responsable_id" class="form-select" required>
                             <option value="">Seleccione responsable</option>
                             @foreach ($responsables as $responsable)
+                            
                                 <option value="{{ $responsable->id }}">
                                     {{ $responsable->nombre }}
                                 </option>
@@ -424,8 +425,7 @@
         const columnasPorTipo = {
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
-            'Descarte': ['col-descarte'],
-            'Certificado': ['col-certificado']
+            'Descarte': ['col-descarte']
         };
 
         function aplicarFiltro(tipo) {
@@ -440,10 +440,10 @@
                 botonActivo.classList.remove('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
             }
 
-            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte', 'col-certificado'];
+            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
 
             document.querySelectorAll('th, td').forEach(el => {
-                if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
+                if (el.className.match(/col-(entrada|salida|descarte)/)) {
                     el.style.display = 'none';
                 }
             });
