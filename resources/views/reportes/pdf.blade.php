@@ -175,7 +175,7 @@
         </tbody>
     </table>
 
-    @if($movimientos->count() > 0)
+    {{-- @if($movimientos->count() > 0)
     <div class="totales">
         <h3>Resumen de Totales</h3>
         <div class="totales-grid">
@@ -197,11 +197,11 @@
             </div>
         </div>
     </div>
-    @endif
+    @endif --}}
 
     <div class="footer">
         <p>Reporte generado automáticamente por el Sistema de Administrativos</p>
         <p>Total de registros: {{ $movimientos->count() }}</p>
     </div>
 </body>
-</html> 
+</html>

@@ -32,6 +32,7 @@ Route::post('producto/importar', [ProductoController::class, 'importar'])->name(
 Route::get('productos/por-clasificacion/{clasificacion_id}', [ProductoController::class, 'porClasificacion']);
 Route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
 Route::get('reportes/exportar-pdf', [ReporteController::class, 'exportarPDF'])->name('reportes.exportar-pdf');
+Route::post('reportes/exportar-pdf-seleccionados', [ReporteController::class, 'exportarPDFSeleccionados'])->name('reportes.exportar-pdf-seleccionados');
 
 Route::resource('usuario', UsuarioController::class);
 

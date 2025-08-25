@@ -54,7 +54,7 @@ class MovimientoController extends Controller
         if($user->role === 'user' && $request->tipo_movimiento !== 'Salida'){
             return redirect()->route('movimiento.create')->with('errores_stock', 'No tienes permiso para registrar este tipo de movimiento.');
         }
-        
+
         // BLOQUE DE SALIDA
         if ($request->tipo_movimiento == "Salida") {
             $request->validate([
@@ -128,6 +128,7 @@ class MovimientoController extends Controller
                             'responsable_id' => $request->responsable_id,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
+                            'creado_por' => Auth::user()->name
                         ]);
 
                         $cantidad_restante -= $descontar;
@@ -161,6 +162,7 @@ class MovimientoController extends Controller
                             'responsable_id' => $request->responsable_id,
                             'motivo' => $request->motivo,
                             'observaciones' => $request->observaciones,
+                            'creado_por' => Auth::user()->name
                         ]);
 
                         $cantidad_restante = 0;
@@ -193,7 +195,7 @@ class MovimientoController extends Controller
             }
 
             return redirect()->route('movimiento.create')->with([
-                'success' => count($errores_stock) == 0 ? 'Movimientos de salida registrados y stock actualizado.' : null,
+                'success' => count($errores_stock) == 0 ? "Movimientos de salida de '{$producto->nombre}' registrados y stock actualizado." : null,
                 'alerta_stock' => count($alerta_stock) ? implode(' | ', $alerta_stock) : null,
                 'errores_stock' => count($errores_stock) ? implode(' | ', $errores_stock) : null,
             ]);
@@ -238,7 +240,8 @@ class MovimientoController extends Controller
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 'responsable_id' => $request->responsable_id,
                 'motivo' => $request->motivo,
-                'observaciones' => $request->observaciones
+                'observaciones' => $request->observaciones,
+                'creado_por' => Auth::user()->name
             ]);
 
             $producto->stock_actual -= $request->cantidad;
@@ -296,7 +299,8 @@ class MovimientoController extends Controller
                 'cantidad' => $request->cantidad,
                 'fecha' => $request->fecha,
                 'evento' => $request->evento,
-                'observaciones' => $request->observaciones
+                'observaciones' => $request->observaciones,
+                'creado_por' => Auth::user()->name
             ]);
 
             $producto->stock_actual -= $request->cantidad;
@@ -367,7 +371,8 @@ class MovimientoController extends Controller
             'solicitante_id' => $request->solicitante_id,
             'responsable_id' => $request->responsable_id,
             'motivo' => $request->motivo,
-            'observaciones' => $request->observaciones
+            'observaciones' => $request->observaciones,
+            'creado_por' => Auth::user()->name
         ]);
 
         // Actualiza el stock según el tipo de movimiento

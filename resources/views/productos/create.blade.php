@@ -2,11 +2,22 @@
 @section('content')
 
 <div class="container">
-    
+
     @if (session('success'))
         <div class="alert alert-success">
             {{session('success')}}
         </div>
+    @endif
+
+     @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close float-end me-3" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
 
     <div class="card">
@@ -61,7 +72,7 @@
                         <label class="form-label">Stock Actual</label>
                         <input type="number" name="stock_actual" class="form-control" value="{{ old('stock_actual', 0) }}">
                     </div>
-                
+
                 </div>
             </div>
 
@@ -71,13 +82,13 @@
         </form>
         </div>
     </div>
-    
+
     <!-- Tanla de insumos registrados -->
     <div class="card mt-5">
         <div class="card-header" style="background:#3177bf">
             <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Listado de Productos</h4>
         </div>
-        
+
         <table class="table table-hover table-striped" id="tabla">
             <thead>
                 <tr class="table-info">

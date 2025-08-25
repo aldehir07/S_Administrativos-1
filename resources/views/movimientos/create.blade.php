@@ -17,6 +17,17 @@
         </div>
     @endif
 
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close float-end me-3" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
     @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -163,11 +174,11 @@
                     <!-- RESPONSABLE -->
                     <div class="mb-3 entrada-campos salida-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Responsable</label>
-                        
+
                         <select name="responsable_id" id="responsable_id" class="form-select" required>
                             <option value="">Seleccione responsable</option>
                             @foreach ($responsables as $responsable)
-                            
+
                                 <option value="{{ $responsable->id }}">
                                     {{ $responsable->nombre }}
                                 </option>
@@ -224,8 +235,9 @@
                             <th class="col-salida ">Evento</th>
                             <th class="col-descarte">Motivo</th>
                             <th class="col-salida col-entrada">Lote</th>
+                            <th class="col-salida col-entrada col-certificado">Creado por</th>
                             <th>Acciones</th>
-                            
+
                         </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -252,7 +264,9 @@
                             <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->responsable->nombre ?? '' }}</td>
                             <td class="col-salida">{{ $mov->evento }}</td>
                             <td class="col-descarte">{{ $mov->motivo }}</td>
-                            <td class="col-salida col-entrada">{{ $mov->lote }}</td>
+                            <td class="col-salida col-entrada">{{ $mov->lote }}</td
+                                >
+                            <td class="col-salida col-entrada col-certificado">{{ $mov->creado_por }}</td>
                             <td>
                                 <a href="{{ route('movimiento.edit', $mov->id) }}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
@@ -389,6 +403,58 @@
             responsableSelect.innerHTML = options;
         }
 
+        // FUNCIÓN PARA ACTUALIZAR SOLICITANTES SEGÚN CLASIFICACIÓN
+        function actualizarSolicitantes() {
+            const tipoMovimiento = tipoRegistro.value;
+            const clasificacionId = clasificacionSelect.value;
+            const solicitanteSelect = document.querySelector('select[name="solicitante_id"]');
+            if (!solicitanteSelect) return;
+
+            // IDs o nombres de los solicitantes permitidos para Certificado
+            const solicitantesCertificado = [
+                @foreach($solicitantes as $solicitante)
+                    @if(in_array($solicitante->nombre, ['Yesenia Delgado', 'Anabel Santana']))
+                        { id: {{ $solicitante->id }}, nombre: "{{ $solicitante->nombre }}" },
+                    @endif
+                @endforeach
+            ];
+
+            // Si es salida y clasificación es Certificado
+            if (tipoMovimiento === 'Salida' && clasificacionSelect.options[clasificacionSelect.selectedIndex]?.text === 'Certificado') {
+                let options = '<option value="" disabled selected>Seleccione</option>';
+                solicitantesCertificado.forEach(s => {
+                    options += `<option value="${s.id}">${s.nombre}</option>`;
+                });
+                solicitanteSelect.innerHTML = options;
+            } else {
+                // Mostrar todos los solicitantes
+                let options = '<option value="" disabled selected>Seleccione</option>';
+                @foreach($solicitantes as $solicitante)
+                    options += `<option value="{{ $solicitante->id }}">{{ $solicitante->nombre }}</option>`;
+                @endforeach
+                solicitanteSelect.innerHTML = options;
+            }
+        }
+
+        //Funcion para habilitar/desabilitar agregar productos segun clasificacion
+        function actualizarAgregarProductoBtn(){
+            const clasificacionId = clasificacionSelect.value;
+            const agregarBtn = document.getElementById('agregarProductoSalida');
+            //Obten el texto de la opcion seleccionada
+            const clasificacionText = clasificacionSelect.options[clasificacionSelect.selectedIndex]?.text?.trim();
+
+            //Lista de clasificaciones permitidas para agregar preductos
+            const permitidas = ['Comestible', 'Desechable', 'Útiles de oficina', 'Insumos de limpieza'];
+
+            if(clasificacionText === 'Certificado'){
+                agregarBtn.disabled = true;
+            }else if(permitidas.include(clasificacionText)){
+                agregarBtn.disabled = false;
+            }else{
+                agregarBtn.disabled = true;
+            }
+        }
+
         // Actualizar productos según clasificación
         clasificacionSelect.addEventListener('change', function() {
             const clasificacionId = this.value;
@@ -420,6 +486,14 @@
                     });
             }
         });
+
+        // Actualizar solicitantes cuando cambie tipo o clasificación
+        tipoRegistro.addEventListener('change', actualizarSolicitantes);
+        clasificacionSelect.addEventListener('change', actualizarSolicitantes);
+        // Actualizar botón cuando cambie la clasificación
+        clasificacionSelect.addEventListener('change', actualizarAgregarProductoBtn);
+        // También al cambiar tipo de movimiento (por si se oculta el campo)
+        tipoRegistro.addEventListener('change', actualizarAgregarProductoBtn);
 
         // Filtros de tabla
         const columnasPorTipo = {
@@ -465,6 +539,8 @@
             });
         }
 
+
+
         document.querySelectorAll('.filtro-movimiento').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const tipo = this.getAttribute('data-tipo');
@@ -482,6 +558,9 @@
             tipoRegistro.value = 'Entrada';
             tipoRegistro.dispatchEvent(new Event('change'));
         @endif
+
+        // Ejecutar al cargar
+        actualizarAgregarProductoBtn();
     });
 </script>
 @endsection

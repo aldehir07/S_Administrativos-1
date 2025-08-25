@@ -25,6 +25,11 @@ class ReporteController extends Controller
         if($request->filled('hasta')){
             $query->where('fecha', '<=', $request->hasta);
         }
+        if($request->filled('clasificacion')){
+            $query->whereHas('producto', function($q) use ($request) {
+                $q->where('clasificacion_id', $request->clasificacion);
+            });
+        }
         if($request->filled('producto_id')){
             $query->where('producto_id', $request->producto_id);
         }
@@ -34,6 +39,9 @@ class ReporteController extends Controller
 
         $movimientos = $query->orderBy('fecha', 'desc')->get();
         $productos = Producto::orderBy('nombre')->get();
+
+        // Obtener clasificaciones únicas desde productos
+        $clasificaciones = Producto::select('clasificacion_id')->distinct()->orderBy('clasificacion_id')->get();
 
         // Filtros de fecha
         $desde = $request->input('desde');
@@ -54,7 +62,7 @@ class ReporteController extends Controller
             ->take(10) // Top 10
             ->get();
 
-        return view('reportes.index', compact('movimientos', 'productos', 'productosMasUsados'));
+        return view('reportes.index', compact('movimientos', 'productos', 'productosMasUsados', 'clasificaciones'));
     }
 
     //Funcion para export a PDF
@@ -67,6 +75,11 @@ class ReporteController extends Controller
         }
         if($request->filled('hasta')){
             $query->where('fecha', '<=', $request->hasta);
+        }
+        if($request->filled('clasificacion')){
+            $query->whereHas('producto', function($q) use ($request) {
+                $q->where('clasificacion', $request->clasificacion);
+            });
         }
         if($request->filled('producto_id')){
             $query->where('producto_id', $request->producto_id);
@@ -97,6 +110,32 @@ class ReporteController extends Controller
     $pdf = Pdf::loadView('reportes.pdf', $data);
 
     return $pdf->download('reporte-movimientos-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    public function exportarPDFSeleccionados(Request $request)
+    {
+        $ids = explode(',', $request->movimientos_ids);
+        $movimientos = Movimiento::whereIn('id', $ids)->with('producto', 'responsable')->get();
+
+        // Calcular totales si lo necesitas
+        $totalEntradas = $movimientos->where('tipo_movimiento', 'Entrada')->sum('cantidad');
+        $totalSalidas = $movimientos->where('tipo_movimiento', 'Salida')->sum('cantidad');
+        $totalDescartes = $movimientos->where('tipo_movimiento', 'Descarte')->sum('cantidad');
+        $totalCertificados = $movimientos->where('tipo_movimiento', 'Certificado')->sum('cantidad');
+
+        $data = [
+            'movimientos' => $movimientos,
+            'totalEntradas' => $totalEntradas,
+            'totalSalidas' => $totalSalidas,
+            'totalDescartes' => $totalDescartes,
+            'totalCertificados' => $totalCertificados,
+            'fechaReporte' => now()->format('d/m/Y H:i:s'),
+            'desde' => null,
+            'hasta' => null,
+        ];
+
+        $pdf = Pdf::loadView('reportes.pdf', $data);
+        return $pdf->download('reporte-movimientos-seleccionados-' . now()->format('Y-m-d') . '.pdf');
     }
 
 

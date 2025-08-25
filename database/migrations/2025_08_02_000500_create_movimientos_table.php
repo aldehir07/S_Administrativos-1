@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('clasificacion_id');
             $table->unsignedBigInteger('responsable_id')->nullable();
             $table->integer('cantidad');
+            $table->string('creado_por');
             $table->date('fecha');
             $table->string('lote')->nullable();
             $table->date('fecha_vencimiento')->nullable();

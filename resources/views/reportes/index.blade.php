@@ -11,15 +11,28 @@
         <div class="card-body">
             <!-- Filtros -->
             <form method="GET" action="{{ route('reportes.index') }}" class="row g-3 mb-4 align-items-end shadow-sm p-3 bg-white rounded">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Desde</label>
                     <input type="date" name="desde" class="form-control" value="{{ request('desde') }}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Hasta</label>
                     <input type="date" name="hasta" class="form-control" value="{{ request('hasta') }}">
                 </div>
-                <div class="col-md-3">
+
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Clasificación</label>
+                    <select name="clasificacion" class="form-select">
+                        <option value="">Todas</option>
+                        @foreach($clasificaciones as $clasificacion)
+                            <option value="{{ $clasificacion->clasificacion_id }}" {{ request('clasificacion') == $clasificacion->clasificacion_id ? 'selected' : '' }}>
+                                {{ \App\Models\Clasificacion::find($clasificacion->clasificacion_id)->nombre ?? 'Sin nombre' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
                     <label class="form-label mb-1">Producto</label>
                     <select name="producto_id" class="form-select">
                         <option value="">Todos</option>
@@ -47,24 +60,24 @@
     </div>
 
     <!-- Botones para Exportar a Excel y PDF -->
-    <div class="d-flex justify-content-end gap-2 mb-3">
-        <!-- <a href="" class="btn btn-success btn-sm">
-            <i class="fas fa-file-excel"></i> Exportar a Excel
-        </a> -->
-        <a href="{{ route('reportes.exportar-pdf', request()->all()) }}" class="btn btn-danger btn-sm">
-            <i class="fas fa-file-pdf"></i> Exportar a PDF
-        </a>
-    </div>
-    
+    <form id="exportarPdfForm" method="POST" action="{{ route('reportes.exportar-pdf-seleccionados') }}" target="_blank" class="d-inline">
+        @csrf
+        <input type="hidden" name="movimientos_ids" id="movimientosIdsInput">
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="fas fa-file-pdf"></i> Exportar seleccionados a PDF
+        </button>
+    </form>
+
     <!-- Tabla de resultados -->
     <div class="card mt-3">
         <div class="card-header" style="background:#3177bf">
             <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Movimientos encontrados</h4>
         </div>
-        
+
             <table class="table table-striped table-hover" id="tabla">
                 <thead >
                     <tr class="table-info">
+                        <th><input type="checkbox" id="selectAll"></th>
                         <th>Fecha</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
@@ -77,6 +90,9 @@
                 <tbody>
                     @forelse($movimientos as $mov)
                     <tr>
+                        <td>
+                            <input type="checkbox" name="movimientos_seleccionados[]" value="{{ $mov->id }}" class="movimiento-checkbox">
+                        </td>
                         <td>{{ $mov->fecha }}</td>
                         <td>{{ $mov->producto->nombre ?? '-' }}</td>
                         <td>{{ $mov->cantidad }}</td>
@@ -97,40 +113,27 @@
                     </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">No hay movimientos para los filtros seleccionados.</td>
+                            <td colspan="8" class="text-center text-muted">No hay movimientos para los filtros seleccionados.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
     </div>
 
-    <!-- Ranking de productos más utilizados -->
-    <!-- @if($productosMasUsados->count())
-        <div class="card shadow-sm">
-            <div class="card-header text-white" style="background:#3177bf">
-                <i class="fas fa-trophy"></i> Productos más utilizados {{ request('desde') || request('hasta') ? 'en el periodo seleccionado' : 'históricamente' }}
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Total Usado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($productosMasUsados as $item)
-                                <tr>
-                                    <td>{{ $item->producto->nombre ?? '-' }}</td>
-                                    <td>{{ $item->total_usada }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    @endif -->
+
 </div>
+<script>
+    document.getElementById('exportarPdfForm').addEventListener('submit', function(e) {
+        const ids = Array.from(document.querySelectorAll('.movimiento-checkbox:checked')).map(cb => cb.value);
+        document.getElementById('movimientosIdsInput').value = ids.join(',');
+        if (ids.length === 0) {
+            e.preventDefault();
+            alert('Seleccione al menos un movimiento para imprimir.');
+        }
+    });
+
+    document.getElementById('selectAll').addEventListener('change', function() {
+        document.querySelectorAll('.movimiento-checkbox').forEach(cb => cb.checked = this.checked);
+    });
+</script>
 @endsection

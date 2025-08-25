@@ -19,7 +19,8 @@ class Movimiento extends Model
         'solicitante_id',
         'responsable_id',
         'motivo',
-        'observaciones'
+        'observaciones',
+        'creado_por',
     ];
 
     public function solicitante(){
