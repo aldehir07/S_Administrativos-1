@@ -59,14 +59,8 @@
                         <input type="number" name="cantidad" class="form-control" min="1" value="{{ $movimiento->cantidad }}">
                     </div>
 
-                    <!-- Evento/Destino -->
-                    <div class="mb-3 salida-campos d-none">
-                        <label class="form-label">Evento / Destino</label>
-                        <input type="text" name="evento" class="form-control" value="{{ $movimiento->evento }}">
-                    </div>
-
                     <!-- Observaciones -->
-                    <div class="mb-3 entrada-campos certificado-campos d-none">
+                    <div class="mb-3 entrada-campos certificado-campos salida-campos d-none">
                         <label class="form-label">Observaciones</label>
                         <textarea name="observaciones" class="form-control" rows="2">{{ $movimiento->observaciones }}</textarea>
                     </div>
@@ -133,7 +127,6 @@
                                 Otro</option>
                         </select>
                     </div>
-
                 </div>
                 </div>
             </div>
@@ -149,7 +142,6 @@
 <div class="card mt-5">
     <div class="card-header" style="background:#3177bf;">
         <h4 class="card-tittle mb-0 text-white"> <i class="fas fa-list"></i> Lista de Movimientos Editados</h4>
-
     </div>
 
     <div class="card-body">
@@ -158,7 +150,6 @@
             <button type="button" class="btn btn-outline-success btn-sm filtro-movimiento" data-tipo="Entrada">Entrada</button>
             <button type="button" class="btn btn-outline-danger btn-sm filtro-movimiento" data-tipo="Salida">Salida</button>
             <button type="button" class="btn btn-outline-warning btn-sm filtro-movimiento" data-tipo="Descarte">Descarte</button>
-            <button type="button" class="btn btn-outline-dark btn-sm filtro-movimiento" data-tipo="Certificado">Certificado</button>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -167,14 +158,13 @@
                 <tr class="table-dark">
                     <th class="col-entrada col-salida col-descarte">Clasificación</th>
                     <th class="col-entrada col-salida col-descarte">Producto</th>
-                    <th class="col-entrada col-salida col-descarte col-certificado">Cantidad</th>
-                    <th class="col-entrada col-certificado">Observaciones</th>
-                    <th class="col-entrada col-salida col-descarte col-certificado">Fecha</th>
+                    <th class="col-entrada col-salida col-descarte">Cantidad</th>
+                    <th class="col-entrada col-salida">Observaciones</th>
+                    <th class="col-entrada col-salida col-descarte">Fecha</th>
                     <th class="col-salida">Solicitado por</th>
                     <th class="col-entrada">Fecha de Vencimiento</th>
-                    <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
+                    <th class="col-entrada col-salida col-descarte">E/S/D/C</th>
                     <th class="col-salida">Responsable</th>
-                    <th class="col-salida">Evento</th>
                     <th class="col-descarte">Motivo</th>
                     <th class="col-entrada">Lote</th>
                     <th>Acciones</th>
@@ -185,24 +175,21 @@
                 <tr class="fila-movimiento" data-tipo="{{ $mov->tipo_movimiento }}">
                     <td class="col-entrada col-salida col-descarte">{{ $mov->clasificacion->nombre ?? '' }}</td>
                     <td class="col-entrada col-salida col-descarte">{{ $mov->producto->nombre ?? '' }}</td>
-                    <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->cantidad }}</td>
-                    <td class="col-entrada col-certificado">{{ $mov->observaciones }}</td>
-                    <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->fecha }}</td>
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->cantidad }}</td>
+                    <td class="col-entrada col-salida">{{ $mov->observaciones }}</td>
+                    <td class="col-entrada col-salida col-descarte">{{ $mov->fecha }}</td>
                     <td class="col-salida">{{ $mov->solicitante->nombre ?? '' }}</td>
                     <td class="col-entrada">{{ $mov->fecha_vencimiento }}</td>
-                    <td class="col-entrada col-salida col-descarte col-certificado">
+                    <td class="col-entrada col-salida col-descarte">
                         @if ($mov->tipo_movimiento === 'Entrada')
                             <span class="badge bg-success">Entrada</span>
                         @elseif ($mov->tipo_movimiento === 'Descarte')
                             <span class="badge bg-warning">Descarte</span>
                         @elseif ($mov->tipo_movimiento === 'Salida')
                             <span class="badge bg-danger">Salida</span>
-                        @elseif ($mov->tipo_movimiento === 'Certificado')
-                                <span class="badge bg-info text-dark">Certificado</span>
                         @endif
                     </td>
-                    <td class="col-salida">{{ $mov->responsable }}</td>
-                    <td class="col-salida">{{ $mov->evento }}</td>
+                    <td class="col-salida">{{ $mov->responsable->nombre ?? '' }}</td>
                     <td class="col-descarte">{{ $mov->motivo }}</td>
                     <td class="col-entrada">{{ $mov->lote }}</td>
                     <td>
@@ -234,7 +221,16 @@
         $('#tabla').DataTable({
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
-            }
+            },
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            order: [[4, 'desc']], //Ordernar por fecha descendente
+            columnDefs: [
+                {
+                    targets: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], //Todos las columnas excepto acciones
+                    searchable: true
+                }
+            ]
         });
     });
 
@@ -244,7 +240,7 @@
             tipoRegistro.dispatchEvent(new Event('change'));
         }
         if (tipoRegistro && tipoRegistro.value) {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
+            const tipos = ['entrada', 'salida', 'descarte'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -253,7 +249,7 @@
         }
 
         tipoRegistro.addEventListener('change', function() {
-            const tipos = ['entrada', 'salida', 'descarte', 'certificado'];
+            const tipos = ['entrada', 'salida', 'descarte'];
             tipos.forEach(tipo => {
                 document.querySelectorAll(`.${tipo}-campos`).forEach(el => el.classList.add('d-none'));
             });
@@ -287,7 +283,6 @@
             'Entrada': ['col-entrada'],
             'Salida': ['col-salida'],
             'Descarte': ['col-descarte'],
-            'Certificado': ['col-certificado']
         };
 
         // Función para aplicar filtros
@@ -310,7 +305,7 @@
 
             // Ocultar todas las columnas específicas
             document.querySelectorAll('th, td').forEach(el => {
-                if (el.className.match(/col-(entrada|salida|descarte|certificado)/)) {
+                if (el.className.match(/col-(entrada|salida|descarte)/)) {
                     el.style.display = 'none';
                 }
             });

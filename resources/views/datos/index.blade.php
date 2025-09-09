@@ -152,7 +152,7 @@
                                     <tr>
                                         <td>{{ $producto->nombre }}</td>
                                         <td>{{ $producto->stock_actual }}</td>
-                                        <td>{{ $producto->lote ?? '-' }}</td>
+                                        <td>{{ $movimientoVencido ? $movimientoVencido->lote : '-' }}</td>
                                         <td>
                                             {{ $movimientoVencido ? \Carbon\Carbon::parse($movimientoVencido->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}
                                         </td>

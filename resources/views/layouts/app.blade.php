@@ -17,6 +17,7 @@
             <div class="loader-fill"></div>
         </div>
     </div>
+    
     @include('plantilla.sidebar')
     <div class="pc-header">
         @include('plantilla.header')
@@ -26,6 +27,7 @@
             @yield('content')
         </div>
     </div>
+
     @include('plantilla.footer')
     @include('plantilla.scripts')
 

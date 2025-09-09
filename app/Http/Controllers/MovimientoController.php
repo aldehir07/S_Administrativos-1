@@ -62,8 +62,10 @@ class MovimientoController extends Controller
                 'cantidades_salida' => 'required|array|min:1',
                 'productos_salida.*' => 'required|exists:productos,id',
                 'cantidades_salida.*' => 'required|integer|min:1',
+                'clasificaciones_salida' => 'required|array|min:1',
+                'clasificaciones_salida.*' => 'required|exists:clasificaciones,id',
                 'responsable_id' => 'required|exists:responsables,id',
-                'evento' => 'required|string',
+
             ]);
 
             // Validar que el responsable pueda hacer salidas
@@ -77,9 +79,17 @@ class MovimientoController extends Controller
             $alerta_stock = [];
             $errores_stock = [];
 
+            // Asegurar que los arrays estén alineados
+            if (count($request->productos_salida) !== count($request->cantidades_salida) || count($request->productos_salida) !== count($request->clasificaciones_salida)) {
+                return redirect()->route('movimiento.create')->with([
+                    'errores_stock' => 'Las listas de productos, cantidades y clasificaciones no coinciden.'
+                ]);
+            }
+
             foreach ($request->productos_salida as $index => $producto_id) {
                 $cantidad_salida = $request->cantidades_salida[$index];
                 $cantidad_restante = $cantidad_salida;
+                $clasificacion_id_fila = $request->clasificaciones_salida[$index];
 
                 $producto = Producto::find($producto_id);
 
@@ -120,8 +130,7 @@ class MovimientoController extends Controller
                             'producto_id' => $producto_id,
                             'cantidad' => $descontar,
                             'fecha' => $request->fecha,
-                            'clasificacion_id' => $request->clasificacion_id,
-                            'evento' => $request->evento,
+                            'clasificacion_id' => $clasificacion_id_fila,
                             'lote' => $mov->lote,
                             'fecha_vencimiento' => $mov->fecha_vencimiento,
                             'solicitante_id' => $request->solicitante_id,
@@ -156,8 +165,7 @@ class MovimientoController extends Controller
                             'producto_id' => $producto_id,
                             'cantidad' => $cantidad_salida,
                             'fecha' => $request->fecha,
-                            'clasificacion_id' => $request->clasificacion_id,
-                            'evento' => $request->evento,
+                            'clasificacion_id' => $clasificacion_id_fila,
                             'solicitante_id' => $request->solicitante_id,
                             'responsable_id' => $request->responsable_id,
                             'motivo' => $request->motivo,
@@ -298,7 +306,6 @@ class MovimientoController extends Controller
                 'clasificacion_id' => $request->clasificacion_id,
                 'cantidad' => $request->cantidad,
                 'fecha' => $request->fecha,
-                'evento' => $request->evento,
                 'observaciones' => $request->observaciones,
                 'creado_por' => Auth::user()->name
             ]);
@@ -365,7 +372,6 @@ class MovimientoController extends Controller
             'cantidad' => $request->cantidad,
             'fecha' => $request->fecha,
             'clasificacion_id' => $request->clasificacion_id,
-            'evento' => $request->evento,
             'lote' => $request->lote,
             'fecha_vencimiento' => $request->fecha_vencimiento,
             'solicitante_id' => $request->solicitante_id,
@@ -421,7 +427,43 @@ class MovimientoController extends Controller
      */
     public function update(Request $request, Movimiento $movimiento)
     {
+        // Ajustar stock al editar un movimiento: revertir el efecto anterior y aplicar el nuevo
+        // Guardar valores anteriores
+        $oldProductoId = $movimiento->producto_id;
+        $oldTipo = $movimiento->tipo_movimiento;
+        $oldCantidad = $movimiento->cantidad;
+
+        // Actualizar movimiento con los nuevos datos
         $movimiento->update($request->all());
+
+        $newProductoId = $movimiento->producto_id;
+        $newTipo = $movimiento->tipo_movimiento;
+        $newCantidad = $movimiento->cantidad;
+
+        // Revertir efecto anterior en el producto anterior
+        $productoAnterior = Producto::find($oldProductoId);
+        if ($productoAnterior) {
+            if ($oldTipo === 'Entrada') {
+                $productoAnterior->stock_actual -= $oldCantidad;
+            } else {
+                $productoAnterior->stock_actual += $oldCantidad;
+            }
+            if ($productoAnterior->stock_actual < 0) $productoAnterior->stock_actual = 0;
+            $productoAnterior->save();
+        }
+
+        // Aplicar efecto nuevo en el producto actual
+        $productoNuevo = Producto::find($newProductoId);
+        if ($productoNuevo) {
+            if ($newTipo === 'Entrada') {
+                $productoNuevo->stock_actual += $newCantidad;
+            } else {
+                $productoNuevo->stock_actual -= $newCantidad;
+            }
+            if ($productoNuevo->stock_actual < 0) $productoNuevo->stock_actual = 0;
+            $productoNuevo->save();
+        }
+
         return redirect()->route('movimiento.create')->with('success', 'Movimiento actualizado correctamente!.');
     }
 
@@ -430,6 +472,18 @@ class MovimientoController extends Controller
      */
     public function destroy(Movimiento $movimiento)
     {
+        // Al eliminar, revertir el efecto de este movimiento en el stock
+        $producto = Producto::find($movimiento->producto_id);
+        if ($producto) {
+            if ($movimiento->tipo_movimiento === 'Entrada') {
+                $producto->stock_actual -= $movimiento->cantidad;
+            } else {
+                $producto->stock_actual += $movimiento->cantidad;
+            }
+            if ($producto->stock_actual < 0) $producto->stock_actual = 0;
+            $producto->save();
+        }
+
         $movimiento->delete();
         return redirect()->route('movimiento.create')->with('success', 'Movimiento eliminado del inventario exitosamente!.');
     }

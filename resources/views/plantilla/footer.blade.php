@@ -2,7 +2,7 @@
     <div class="footer-wrapper container-fluid">
       <div class="row">
         <div class="col-sm my-1">
-          <p class="m-0"><strong>SIDSA</strong> creado por el equipo de: Unidad de Servicios Tecnologicos.</p>
+          <p class="m-0"><strong>SIDSA</strong> creado por el equipo de: <strong>Departamento de Desarrollo Digital.</strong></p>
         </div>
         <div class="col-auto my-1">
           <ul class="list-inline footer-link mb-0">

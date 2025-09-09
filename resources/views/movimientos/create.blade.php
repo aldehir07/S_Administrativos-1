@@ -64,7 +64,7 @@
                 <!-- Columna Izquierda -->
                 <div class="col-md-6">
                     <!-- Clasificación -->
-                    <div class="mb-3 entrada-campos salida-campos descarte-campos d-none">
+                    <div class="mb-3 entrada-campos descarte-campos certificado-campos d-none">
                         <label class="form-label">Clasificación</label>
                         <select name="clasificacion_id" id="clasificacionSelect" class="form-select" required>
                             <option value="" disabled>Seleccione</option>
@@ -81,14 +81,17 @@
                         <label class="form-label">Productos y Cantidades</label>
                         <div id="productosSalidaRows">
                             <div class="row mb-2 producto-salida-row">
-                                <div class="col-8">
-                                    <select name="productos_salida[]" class="form-select producto-salida-select">
-                                        <option value="" disabled {{ !isset($producto_id) ? 'selected' : '' }}>Seleccione un producto</option>
-                                        @foreach ($productos as $producto)
-                                        <option value="{{ $producto->id }}" {{ (isset($producto_id) && $producto_id == $producto->id) ? 'selected' : '' }}>
-                                            {{ $producto->nombre }}
-                                        </option>
+                                <div class="col-4">
+                                    <select name="clasificaciones_salida[]" class="form-select clasificacion-salida-select">
+                                        <option value="" disabled selected>Seleccione clasificación</option>
+                                        @foreach ($clasificaciones as $clasificacion)
+                                        <option value="{{ $clasificacion->id }}">{{ $clasificacion->nombre }}</option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <select name="productos_salida[]" class="form-select producto-salida-select">
+                                        <option value="" disabled selected>Seleccione un producto</option>
                                     </select>
                                 </div>
                                 <div class="col-3">
@@ -123,14 +126,8 @@
                         <input type="number" name="cantidad" class="form-control" min="1">
                     </div>
 
-                    <!-- Evento/Destino -->
-                    <div class="mb-3 salida-campos d-none">
-                        <label class="form-label">Evento / Destino</label>
-                        <input type="text" name="evento" class="form-control">
-                    </div>
-
                     <!-- Observaciones -->
-                    <div class="mb-3 entrada-campos certificado-campos d-none">
+                    <div class="mb-3 entrada-campos certificado-campos salida-campos d-none">
                         <label class="form-label">Observaciones</label>
                         <textarea name="observaciones" class="form-control" rows="2"></textarea>
                     </div>
@@ -232,7 +229,6 @@
                             <th class="col-entrada">Fecha de Vencimiento</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">E/S/D/C</th>
                             <th class="col-entrada col-salida col-descarte col-certificado">Responsable</th>
-                            <th class="col-salida ">Evento</th>
                             <th class="col-descarte">Motivo</th>
                             <th class="col-salida col-entrada">Lote</th>
                             <th class="col-salida col-entrada col-certificado">Creado por</th>
@@ -262,7 +258,7 @@
                                 @endif
                             </td>
                             <td class="col-entrada col-salida col-descarte col-certificado">{{ $mov->responsable->nombre ?? '' }}</td>
-                            <td class="col-salida">{{ $mov->evento }}</td>
+
                             <td class="col-descarte">{{ $mov->motivo }}</td>
                             <td class="col-salida col-entrada">{{ $mov->lote }}</td
                                 >
@@ -291,11 +287,54 @@
 <!-- JavaScript para alternar campos -->
 <script>
     $(document).ready(function() {
-        $('#tabla').DataTable({
+        // Inicializar DataTable con configuración personalizada
+        var table = $('#tabla').DataTable({
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
-            }
+            },
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            order: [[4, 'desc']], // Ordenar por fecha descendente
+            columnDefs: [
+                {
+                    targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], // Todas las columnas excepto acciones
+                    searchable: true
+                }
+            ]
         });
+
+        // Función para aplicar filtros personalizados
+        function aplicarFiltroDataTable(tipo) {
+            // Limpiar filtros personalizados anteriores
+            $.fn.dataTable.ext.search.pop();
+            
+            if (tipo) {
+                // Aplicar filtro personalizado
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    const tipoMovimiento = data[7]; // Columna del tipo de movimiento
+                    return tipoMovimiento.includes(tipo);
+                });
+            }
+            
+            table.draw();
+        }
+
+        // Event listeners para los botones de filtro
+        $('.filtro-movimiento').on('click', function() {
+            const tipo = $(this).data('tipo');
+            
+            // Actualizar estado visual de los botones
+            $('.filtro-movimiento').removeClass('active btn-primary')
+                .addClass('btn-outline-secondary btn-outline-success btn-outline-danger btn-outline-warning');
+            
+            $(this).addClass('active btn-primary')
+                .removeClass('btn-outline-secondary btn-outline-success btn-outline-danger btn-outline-warning');
+            
+            // Aplicar filtro
+            aplicarFiltroDataTable(tipo);
+        });
+
+        // Resto del código JavaScript para el formulario...
     });
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -321,24 +360,14 @@
         // Agregar producto de salida
         document.getElementById('agregarProductoSalida').addEventListener('click', function() {
             const row = document.querySelector('.producto-salida-row').cloneNode(true);
-            row.querySelector('select').value = '';
-            row.querySelector('input').value = '';
+            // Limpiar valores de la nueva fila
+            const filaClasificacion = row.querySelector('.clasificacion-salida-select');
+            const filaProducto = row.querySelector('.producto-salida-select');
+            const filaCantidad = row.querySelector('input[name="cantidades_salida[]"]');
+            if (filaClasificacion) filaClasificacion.value = '';
+            if (filaProducto) filaProducto.innerHTML = '<option value="" disabled selected>Seleccione un producto</option>';
+            if (filaCantidad) filaCantidad.value = '';
             document.getElementById('productosSalidaRows').appendChild(row);
-
-            const clasificacionId = clasificacionSelect.value;
-            const productoSelect = row.querySelector('.producto-salida-select');
-            if (clasificacionId) {
-                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
-                fetch(`/productos/por-clasificacion/${clasificacionId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
-                        data.forEach(producto => {
-                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
-                        });
-                        productoSelect.innerHTML = options;
-                    });
-            }
         });
 
         // Remover producto de salida
@@ -379,6 +408,26 @@
             }
         });
 
+        // Poblar productos por fila según la clasificación de esa fila (solo en Salida)
+        document.getElementById('productosSalidaRows').addEventListener('change', function(e) {
+            if (e.target.classList.contains('clasificacion-salida-select')) {
+                const row = e.target.closest('.producto-salida-row');
+                const productoSelect = row.querySelector('.producto-salida-select');
+                const clasificacionId = e.target.value;
+                if (!productoSelect || !clasificacionId) return;
+                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+                fetch(`/productos/por-clasificacion/${clasificacionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
+                        data.forEach(producto => {
+                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
+                        });
+                        productoSelect.innerHTML = options;
+                    });
+            }
+        });
+
         // FUNCIÓN PARA ACTUALIZAR RESPONSABLES
         function actualizarResponsables(tipoMovimiento) {
             const responsableSelect = document.getElementById('responsable_id');
@@ -394,11 +443,11 @@
                 responsablesDisponibles = @json($responsables->where('tipo', 'completo'));
             }
 
-            // let options = '<option value="">Seleccione responsable</option>';
-            // responsablesDisponibles.forEach(responsable => {
-            //     const piso = responsable.piso ? ` - ${responsable.piso}` : '';
-            //     options += `<option value="${responsable.id}">${responsable.nombre}${piso}</option>`;
-            // });
+            let options = '<option value="">Seleccione responsable</option>';
+            responsablesDisponibles.forEach(responsable => {
+                const piso = responsable.piso ? ` - ${responsable.piso}` : '';
+                options += `<option value="${responsable.id}">${responsable.nombre}${piso}</option>`;
+            });
 
             responsableSelect.innerHTML = options;
         }
@@ -438,39 +487,29 @@
 
         //Funcion para habilitar/desabilitar agregar productos segun clasificacion
         function actualizarAgregarProductoBtn(){
-            const clasificacionId = clasificacionSelect.value;
             const agregarBtn = document.getElementById('agregarProductoSalida');
-            //Obten el texto de la opcion seleccionada
-            const clasificacionText = clasificacionSelect.options[clasificacionSelect.selectedIndex]?.text?.trim();
+            if (!agregarBtn) return;
 
-            //Lista de clasificaciones permitidas para agregar preductos
-            const permitidas = ['Comestible', 'Desechable', 'Útiles de oficina', 'Insumos de limpieza'];
+            const tipo = document.getElementById('tipoRegistro')?.value;
+            const clasificacionText = clasificacionSelect.options[clasificacionSelect.selectedIndex]?.text?.trim() || '';
 
-            if(clasificacionText === 'Certificado'){
+            // Solo habilitar en Salida y cuando la clasificacion NO sea Certificado
+            if (tipo !== 'Salida') {
                 agregarBtn.disabled = true;
-            }else if(permitidas.include(clasificacionText)){
-                agregarBtn.disabled = false;
-            }else{
-                agregarBtn.disabled = true;
+                return;
             }
+
+            agregarBtn.disabled = (clasificacionText === 'Certificado');
         }
 
-        // Actualizar productos según clasificación
+        // Actualizar productos según clasificación (NO afectar filas de Salida)
         clasificacionSelect.addEventListener('change', function() {
             const clasificacionId = this.value;
-
-            document.querySelectorAll('.producto-salida-select').forEach(function(productoSelect) {
-                productoSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
-                fetch(`/productos/por-clasificacion/${clasificacionId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        let options = '<option value="" disabled selected>Seleccione un producto</option>';
-                        data.forEach(producto => {
-                            options += `<option value="${producto.id}">${producto.nombre}</option>`;
-                        });
-                        productoSelect.innerHTML = options;
-                    });
-            });
+            if (tipoRegistro && tipoRegistro.value === 'Salida') {
+                // En Salida, cada fila maneja su propia clasificación; no actualizar selects por fila
+            } else {
+                // Para Entrada/Descarte, actualizar el select único
+            }
 
             const productoUnicoSelect = document.getElementById('productoSelectUnico');
             if (productoUnicoSelect) {
@@ -494,61 +533,6 @@
         clasificacionSelect.addEventListener('change', actualizarAgregarProductoBtn);
         // También al cambiar tipo de movimiento (por si se oculta el campo)
         tipoRegistro.addEventListener('change', actualizarAgregarProductoBtn);
-
-        // Filtros de tabla
-        const columnasPorTipo = {
-            'Entrada': ['col-entrada'],
-            'Salida': ['col-salida'],
-            'Descarte': ['col-descarte']
-        };
-
-        function aplicarFiltro(tipo) {
-            document.querySelectorAll('.filtro-movimiento').forEach(b => {
-                b.classList.remove('active', 'btn-primary');
-                b.classList.add('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
-            });
-
-            const botonActivo = document.querySelector(`[data-tipo="${tipo}"]`);
-            if (botonActivo) {
-                botonActivo.classList.add('active', 'btn-primary');
-                botonActivo.classList.remove('btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning');
-            }
-
-            const mostrar = columnasPorTipo[tipo] || ['col-entrada', 'col-salida', 'col-descarte'];
-
-            document.querySelectorAll('th, td').forEach(el => {
-                if (el.className.match(/col-(entrada|salida|descarte)/)) {
-                    el.style.display = 'none';
-                }
-            });
-
-            if (mostrar && mostrar.length > 0) {
-                mostrar.forEach(clase => {
-                    document.querySelectorAll('.' + clase).forEach(el => {
-                        el.style.display = '';
-                    });
-                });
-            }
-
-            document.querySelectorAll('.fila-movimiento').forEach(function(row) {
-                if (!tipo || row.getAttribute('data-tipo') === tipo) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-
-
-        document.querySelectorAll('.filtro-movimiento').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const tipo = this.getAttribute('data-tipo');
-                aplicarFiltro(tipo);
-            });
-        });
-
-        aplicarFiltro('');
 
         if (tipoRegistro.value) {
             tipoRegistro.dispatchEvent(new Event('change'));

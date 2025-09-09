@@ -83,7 +83,6 @@
                         <th>Cantidad</th>
                         <th>Tipo</th>
                         <th>Responsable</th>
-                        <th>Evento/Destino</th>
                         <th>Observaciones</th>
                     </tr>
                 </thead>
@@ -108,7 +107,6 @@
                             @endif
                         </td>
                         <td>{{ $mov->responsable->nombre ?? '-' }}</td>
-                        <td>{{ $mov->evento ?? '-' }}</td>
                         <td>{{ $mov->observaciones ?? '-' }}</td>
                     </tr>
                     @empty

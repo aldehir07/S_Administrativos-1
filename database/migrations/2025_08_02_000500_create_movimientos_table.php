@@ -22,7 +22,6 @@ return new class extends Migration
             $table->date('fecha');
             $table->string('lote')->nullable();
             $table->date('fecha_vencimiento')->nullable();
-            $table->string('evento')->nullable();
             $table->unsignedBigInteger('solicitante_id')->nullable();
             $table->string('motivo')->nullable();
             $table->text('observaciones')->nullable();

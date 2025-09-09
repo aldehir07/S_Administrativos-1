@@ -109,7 +109,7 @@ class DatoController extends Controller
         $certificadosDescuentados = 0;
         if ($clasificacionCertificados) {
             // Suma todas las salidas de productos certificados
-            $certificadosDescuentados = \App\Models\Movimiento::where('tipo_movimiento', 'Salida')
+            $certificadosDescuentados = Movimiento::where('tipo_movimiento', 'Salida')
                 ->whereHas('producto', function($q) use ($clasificacionCertificados) {
                     $q->where('clasificacion_id', $clasificacionCertificados->id);
                 })

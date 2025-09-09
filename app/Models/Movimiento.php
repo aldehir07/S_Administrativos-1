@@ -13,7 +13,6 @@ class Movimiento extends Model
         'cantidad',
         'fecha',
         'clasificacion_id',
-        'evento',
         'lote',
         'fecha_vencimiento',
         'solicitante_id',
